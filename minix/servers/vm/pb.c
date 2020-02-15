@@ -85,7 +85,9 @@ struct	phys_region *pb_reference(struct phys_block *newpb,
 	/* New physical region. */
 	pb_link(newphysr, newpb, offset, region);
 
-	physblock_set(region, offset, newphysr);
+	if (!physblock_set(region, offset, newphysr)) {
+		return NULL;
+	}
 
 	return newphysr;
 }

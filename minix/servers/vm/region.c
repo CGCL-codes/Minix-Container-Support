@@ -69,7 +69,7 @@ struct phys_region *physblock_get(struct vir_region *region, vir_bytes offset)
 	return foundregion;
 }
 
-void physblock_set(struct vir_region *region, vir_bytes offset,
+int physblock_set(struct vir_region *region, vir_bytes offset,
 	struct phys_region *newphysr)
 {
 	int i;
@@ -82,6 +82,11 @@ void physblock_set(struct vir_region *region, vir_bytes offset,
 	if(newphysr) {
 		assert(!region->physblocks[i]);
 		assert(newphysr->offset == offset);
+
+		/* Judge memory limit */
+		if (proc->vm_total + VM_PAGE_SIZE > proc->vm_limit_in_bytes) {
+			return 0;
+		}
 		proc->vm_total += VM_PAGE_SIZE;
 		if (proc->vm_total > proc->vm_total_max)
 			proc->vm_total_max = proc->vm_total;
@@ -90,6 +95,7 @@ void physblock_set(struct vir_region *region, vir_bytes offset,
 		proc->vm_total -= VM_PAGE_SIZE;
 	}
 	region->physblocks[i] = newphysr;
+	return 1;
 }
 
 /*===========================================================================*

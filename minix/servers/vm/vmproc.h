@@ -29,11 +29,17 @@ struct vmproc {
 	vir_bytes	vm_total_max;
 	u64_t		vm_minor_page_fault;
 	u64_t		vm_major_page_fault;
+
+	/* Cgroup information */
+	vir_bytes	vm_limit_in_bytes;
 };
 
 /* Bits for vm_flags */
 #define VMF_INUSE	0x001	/* slot contains a process */
 #define VMF_EXITING	0x002	/* PM is cleaning up this process */
 #define VMF_VM_INSTANCE 0x010   /* This is a VM process instance */
+
+/* Default memory limit */
+#define MAX_VM_LIMIT 4294967295
 
 #endif

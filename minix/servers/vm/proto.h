@@ -171,7 +171,9 @@ void map_setparent(struct vmproc *vmp);
 u32_t vrallocflags(u32_t flags);
 int map_free(struct vir_region *region);
 struct phys_region *physblock_get(struct vir_region *region, vir_bytes offset);
-void physblock_set(struct vir_region *region, vir_bytes offset,
+
+/* Modify return value */
+int physblock_set(struct vir_region *region, vir_bytes offset,
 	struct phys_region *newphysr);
 int map_ph_writept(struct vmproc *vmp, struct vir_region *vr,
         struct phys_region *pr);

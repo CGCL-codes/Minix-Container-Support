@@ -459,6 +459,9 @@ void init_vm(void)
 
 	for(i = 0; i < ELEMENTS(vmproc); i++) {
 		vmproc[i].vm_slot = i;
+
+		/* Initialize memory limit */
+		vmproc[i].vm_limit_in_bytes = MAX_VM_LIMIT;
 	}
 
 	/* Initialize ACL data structures. */
