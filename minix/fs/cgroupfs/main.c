@@ -2,6 +2,8 @@
 
 #include "head.h"
 
+static void init_hook(void);
+
 /* The hook functions */
 static struct fs_hooks hooks =
 {

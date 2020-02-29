@@ -33,6 +33,6 @@ void mem_cgroup_init(struct inode *root)
     assert(inode != NULL);
 
     /* Initialize the centent in file(vm_limit_in_bytes) */
-    data[MEMORY_CGROUP] = "0";
+    strcpy(data[MEMORY_CGROUP], "000");
 
 }

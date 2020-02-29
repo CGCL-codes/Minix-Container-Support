@@ -16,7 +16,7 @@
 #define NR_SUBSYSTEMS   1
 
 /* Directory index */
-#define MEMORY_CGROUP   1
+#define MEMORY_CGROUP   0
 
 
 #endif /* _CGROUPFS_CONST_H */
