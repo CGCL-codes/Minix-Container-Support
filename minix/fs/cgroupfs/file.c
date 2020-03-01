@@ -19,7 +19,7 @@ ssize_t read_hook(struct inode *inode, char *ptr, size_t len, off_t off,
     {
     case MEMORY_CGROUP:
         
-        buf_read(data[MEMORY_CGROUP], sizeof(char) * (strlen(data[MEMORY_CGROUP])+1));
+        buf_read(data[MEMORY_CGROUP], sizeof(char) * strlen(data[MEMORY_CGROUP]));
         break;
     
     default:
