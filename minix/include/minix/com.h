@@ -769,6 +769,9 @@
 #define NR_VM_CALLS				49
 #define VM_CALL_MASK_SIZE			BITMAP_CHUNKS(NR_VM_CALLS)
 
+/* Calls from cgroupfs */
+#define VM_CGROUP_INFO			51
+
 /* not handled as a normal VM call, thus at the end of the reserved rage */
 #define VM_PAGEFAULT		(VM_RQ_BASE+0xff)
 #	define VPF_ADDR		m1_i1

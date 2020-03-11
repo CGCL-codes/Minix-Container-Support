@@ -15,7 +15,7 @@ ssize_t write_hook(struct inode *inode, char *ptr, size_t max,
 
 /* memory.c */
 void mem_cgroup_init(struct inode *root);
-
+void mem_ctl(char * ptr);
 
 
 #endif

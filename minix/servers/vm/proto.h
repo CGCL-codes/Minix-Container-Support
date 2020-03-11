@@ -82,6 +82,7 @@ int do_remap(message *m);
 int do_get_phys(message *m);
 int do_get_refcount(message *m);
 int do_vfs_mmap(message *m);
+int do_cgroup(message *m);   //Handler of VM_CGROUP_INFO
 
 /* pagefaults.c */
 void do_pagefaults(message *m);

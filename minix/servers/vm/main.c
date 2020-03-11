@@ -577,6 +577,9 @@ void init_vm(void)
 	/* getrusage */
 	CALLMAP(VM_GETRUSAGE, do_getrusage);
 
+	/* Calls from cgroupfs */
+	CALLMAP(VM_CGROUP_INFO, do_cgroup);
+
 	/* Mark VM instances. */
 	num_vm_instances = 1;
 	vmproc[VM_PROC_NR].vm_flags |= VMF_VM_INSTANCE;

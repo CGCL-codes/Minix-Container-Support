@@ -2,6 +2,8 @@
 
 #include "head.h"
 
+struct memory_cgroup mem_cgroup[NR_PID];
+
 /* Memory cgroup initialization */
 void mem_cgroup_init(struct inode *root)
 {
@@ -35,4 +37,58 @@ void mem_cgroup_init(struct inode *root)
     /* Initialize the centent in file(vm_limit_in_bytes) */
     strcpy(data[MEMORY_CGROUP], "000");
 
+    /* Initialize memory_cgroup information */
+    for(int i = 0; i < NR_PID; i++) {
+        mem_cgroup[i].pid = -1;
+        mem_cgroup[i].vm_limit = -1;
+    }
+
+}
+
+/* Passing memory cgroup information to vm through system call */
+void mem_ctl(char * ptr)
+{
+    int start = 0, mid = 0, end = 0;
+    pid_t pid;
+    vir_bytes vm_limit;
+    struct minix_proc_data mpd;
+
+    for(start = 0;; end++) {
+        if(ptr[end] == ' ') {
+            mid = end - 1;
+            continue;
+        }
+
+        if(ptr[end] == '\n' || ptr[end] == '\0') {
+
+            // Search and transform pid
+            char * tmp;
+            int len = mid -start + 1;
+            memcpy(tmp, ptr[start], len);
+            tmp[len] = '\0';
+            pid = atoi(tmp);
+
+            // Transform vm_limit
+            len = end - mid - 2;
+            memcpy(tmp, ptr[mid + 2], len);
+            tmp[len] = '\0';
+            vm_limit = strtoul(tmp);
+
+            start = end + 1;
+
+            // Judge if it is the latest vm_limit information. if yes, make the system call
+            if(mem_cgroup[pid].pid != -1 && mem_cgroup[pid].vm_limit != vm_limit) {
+                mem_cgroup[pid].pid = pid;
+                mem_cgroup[pid].vm_limit = vm_limit;
+
+                if (get_proc_data(pid, &mpd) != OK)
+		            return;
+                if (sys_cgptovm(mpd.mpd_endpoint, vm_limit) != OK)
+                    return;
+            }
+        }
+
+        if(ptr[end] == '\0')
+            break;
+    }
 }
