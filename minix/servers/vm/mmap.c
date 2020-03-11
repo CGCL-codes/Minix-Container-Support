@@ -2,16 +2,19 @@
 #define _SYSTEM 1
 
 #include <minix/callnr.h>
-#include <minix/com.h>
+// #include <minix/com.h>
+#include "include/minix/com.h"
 #include <minix/config.h>
 #include <minix/const.h>
 #include <minix/ds.h>
 #include <minix/endpoint.h>
 #include <minix/minlib.h>
 #include <minix/type.h>
-#include <minix/ipc.h>
+// #include <minix/ipc.h>
+#include "include/minix/ipc.h"
 #include <minix/sysutil.h>
-#include <minix/syslib.h>
+// #include <minix/syslib.h>
+#include "include/minix/syslib.h"
 #include <minix/safecopies.h>
 #include <minix/bitmap.h>
 #include <minix/debug.h>
