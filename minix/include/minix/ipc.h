@@ -2405,7 +2405,7 @@ typedef struct {
 	endpoint_t proc;
 	vir_bytes vm_limit;
 
-	uint8_t padding[44];
+	uint8_t padding[48];
 } mess_lsys_cgp_vm_info;   /* Cgroupfs to vm */
 _ASSERT_MSG_SIZE(mess_lsys_cgp_vm_info);
 
