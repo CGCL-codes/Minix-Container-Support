@@ -15,7 +15,7 @@
 #include "glo.h"
 #include "proto.h"
 #include "type.h"
-#include "include/minix/syslib.h"
+#include "../../include/minix/syslib.h"
 
 
 #endif /* _PROCFS_HEAD_H */

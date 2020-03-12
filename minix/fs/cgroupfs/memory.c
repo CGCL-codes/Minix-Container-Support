@@ -64,15 +64,15 @@ void mem_ctl(char * ptr)
             // Search and transform pid
             char * tmp;
             int len = mid -start + 1;
-            memcpy(tmp, ptr[start], len);
+            memcpy(tmp, &ptr[start], len);
             tmp[len] = '\0';
             pid = atoi(tmp);
 
             // Transform vm_limit
             len = end - mid - 2;
-            memcpy(tmp, ptr[mid + 2], len);
+            memcpy(tmp, &ptr[mid + 2], len);
             tmp[len] = '\0';
-            vm_limit = strtoul(tmp);
+            vm_limit = strtoul(tmp, NULL, 0);
 
             start = end + 1;
 
@@ -91,4 +91,21 @@ void mem_ctl(char * ptr)
         if(ptr[end] == '\0')
             break;
     }
+}
+
+/*
+ * Get MINIX3-specific process data for the process identified by the given
+ * kernel slot.  Return OK or a negative error code.
+ */
+int
+get_proc_data(pid_t pid, struct minix_proc_data * mpd)
+{
+	int mib[4] = { CTL_MINIX, MINIX_PROC, PROC_DATA, pid };
+	size_t oldlen;
+
+	oldlen = sizeof(*mpd);
+	if (__sysctl(mib, __arraycount(mib), mpd, &oldlen, NULL, 0) != 0)
+		return -errno;
+
+	return OK;
 }
