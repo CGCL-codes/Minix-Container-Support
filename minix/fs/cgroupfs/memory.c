@@ -49,8 +49,8 @@ void mem_cgroup_init(struct inode *root)
 void mem_ctl(char * ptr)
 {
     int start = 0, mid = 0, end = 0;
-    pid_t pid;
-    vir_bytes vm_limit;
+    pid_t pid = 0;
+    vir_bytes vm_limit = 0;
     struct minix_proc_data mpd;
 
     for(start = 0;; end++) {
@@ -67,12 +67,15 @@ void mem_ctl(char * ptr)
             memcpy(tmp, &ptr[start], len);
             tmp[len] = '\0';
             pid = atoi(tmp);
+            assert(pid > 0);
+            assert(pid > 400);
 
             // Transform vm_limit
             len = end - mid - 2;
             memcpy(tmp, &ptr[mid + 2], len);
             tmp[len] = '\0';
             vm_limit = strtoul(tmp, NULL, 0);
+            assert(vm_limit > 0);
 
             start = end + 1;
 
