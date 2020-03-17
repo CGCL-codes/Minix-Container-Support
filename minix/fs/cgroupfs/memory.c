@@ -62,20 +62,23 @@ void mem_ctl(char * ptr)
         if(ptr[end] == '\n' || ptr[end] == '\0') {
 
             // Search and transform pid
-            char * tmp;
+            char tmp_pid[20], tmp_vm[20];
             int len = mid -start + 1;
-            memcpy(tmp, &ptr[start], len);
-            tmp[len] = '\0';
-            pid = atoi(tmp);
+            memcpy(tmp_pid, &ptr[start], len);
+            tmp_pid[len] = '\0';
+            pid = atoi(tmp_pid);
             assert(pid > 0);
             assert(pid > 400);
 
             // Transform vm_limit
             len = end - mid - 2;
-            memcpy(tmp, &ptr[mid + 2], len);
-            tmp[len] = '\0';
-            vm_limit = strtoul(tmp, NULL, 0);
+            memcpy(tmp_vm, &ptr[mid + 2], len);
+            tmp_vm[len] = '\0';
+            vm_limit = strtoul(tmp_vm, NULL, 0);
             assert(vm_limit > 0);
+
+            printf("pid: %d\n", pid);
+            printf("vm_limit: %ld\n", vm_limit);
 
             start = end + 1;
 
