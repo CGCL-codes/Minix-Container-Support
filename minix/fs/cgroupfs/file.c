@@ -50,7 +50,7 @@ ssize_t write_hook(struct inode *inode, char *ptr, size_t max,
     case MEMORY_CGROUP:
         
         buf_write(ptr, data[MEMORY_CGROUP], max, off);
-        mem_ctl(ptr);
+        mem_ctl(data[MEMORY_CGROUP]);
         break;
     
     default:
