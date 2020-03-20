@@ -81,7 +81,7 @@ void mem_ctl(char * ptr)
             start = end + 1;
 
             // Judge if it is the latest vm_limit information. if yes, make the system call
-            if(mem_cgroup[pid].pid != -1 && mem_cgroup[pid].vm_limit != vm_limit) {
+            if(mem_cgroup[pid].pid == -1 || (mem_cgroup[pid].pid != -1 && mem_cgroup[pid].vm_limit != vm_limit)) {
                 mem_cgroup[pid].pid = pid;
                 mem_cgroup[pid].vm_limit = vm_limit;
 
