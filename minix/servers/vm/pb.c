@@ -86,6 +86,7 @@ struct	phys_region *pb_reference(struct phys_block *newpb,
 	pb_link(newphysr, newpb, offset, region);
 
 	if (!physblock_set(region, offset, newphysr)) {
+		printf("vm: pb_reference: exceeding phys region limit\n");
 		return NULL;
 	}
 

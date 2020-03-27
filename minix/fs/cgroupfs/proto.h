@@ -15,7 +15,8 @@ ssize_t write_hook(struct inode *inode, char *ptr, size_t max,
 
 /* memory.c */
 void mem_cgroup_init(struct inode *root);
-
+void mem_ctl(char * ptr);
+int get_proc_data(pid_t pid, struct minix_proc_data * mpd);
 
 
 #endif

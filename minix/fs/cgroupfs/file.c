@@ -19,7 +19,7 @@ ssize_t read_hook(struct inode *inode, char *ptr, size_t len, off_t off,
     {
     case MEMORY_CGROUP:
         
-        buf_read(data[MEMORY_CGROUP], sizeof(char) * (strlen(data[MEMORY_CGROUP])+1));
+        buf_read(data[MEMORY_CGROUP], sizeof(char) * strlen(data[MEMORY_CGROUP]));
         break;
     
     default:
@@ -40,14 +40,17 @@ ssize_t write_hook(struct inode *inode, char *ptr, size_t max,
     parent = get_parent_inode(inode);
     parent_index = get_inode_index(parent);
 
+    /* Initialize the file content */
+    if(off == 0) {
+        memset(data[parent_index], 0, sizeof(char) * STR_SIZE);
+    }
+
     switch (parent_index)
     {
     case MEMORY_CGROUP:
         
-        if(off == 0) {
-            memset(data[MEMORY_CGROUP], 0, sizeof(char) * STR_SIZE);
-        }
         buf_write(ptr, data[MEMORY_CGROUP], max, off);
+        mem_ctl(data[MEMORY_CGROUP]);
         break;
     
     default:

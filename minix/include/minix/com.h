@@ -765,9 +765,13 @@
 
 #define VM_RS_PREPARE		(VM_RQ_BASE+48)
 
+/* Calls from cgroupfs */
+#define VM_CGROUP_INFO		(VM_RQ_BASE+49)
+
 /* Total. */
-#define NR_VM_CALLS				49
+#define NR_VM_CALLS				50
 #define VM_CALL_MASK_SIZE			BITMAP_CHUNKS(NR_VM_CALLS)
+
 
 /* not handled as a normal VM call, thus at the end of the reserved rage */
 #define VM_PAGEFAULT		(VM_RQ_BASE+0xff)

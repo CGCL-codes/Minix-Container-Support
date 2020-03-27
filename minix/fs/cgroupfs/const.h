@@ -4,7 +4,7 @@
 /* Max number of inodes */
 #define NR_INODES   512
 /* Max number of pid */
-#define NR_PID  1024
+#define NR_PID  ((NR_TASKS + NR_PROCS) * 4)
 
 /* File modes */
 #define REG_RW_ALL_MODE (S_IFREG | 0666)  /* World-readable-writable regular */
@@ -16,7 +16,7 @@
 #define NR_SUBSYSTEMS   1
 
 /* Directory index */
-#define MEMORY_CGROUP   1
+#define MEMORY_CGROUP   0
 
 
 #endif /* _CGROUPFS_CONST_H */
