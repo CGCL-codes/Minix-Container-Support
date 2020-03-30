@@ -18,5 +18,8 @@ void mem_cgroup_init(struct inode *root);
 void mem_ctl(char * ptr);
 int get_proc_data(pid_t pid, struct minix_proc_data * mpd);
 
+/* freezer.c */
+void freezer_cgroup_init(struct inode *root);
+void freezer_ctl(char * ptr);
 
 #endif

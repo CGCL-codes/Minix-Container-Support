@@ -17,6 +17,7 @@
 
 /* Directory index */
 #define MEMORY_CGROUP   0
+#define FREEZER_CGROUP  1
 
 
 #endif /* _CGROUPFS_CONST_H */
