@@ -13,7 +13,7 @@
 /* Size of the I/O buffer and the str storing file content. */
 #define BUF_SIZE	4097			/* 4KB+1 (see buf.c) */
 #define STR_SIZE    1024*5         /* 5KB */
-#define NR_SUBSYSTEMS   1
+#define NR_SUBSYSTEMS   2
 
 /* Directory index */
 #define MEMORY_CGROUP   0

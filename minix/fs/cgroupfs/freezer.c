@@ -86,8 +86,14 @@ void freezer_ctl(char * ptr)
                 free_cgroup[pid].pid = pid;
                 free_cgroup[pid].state = state;
 
-                // if (get_proc_data(pid, &mpd) != OK)
-		        //     return;
+                if (get_proc_data(pid, &mpd) != OK)
+		            return;
+                
+                if(state == 0) {
+                    sys_kill(mpd.mpd_endpoint, SIGSTOP);
+                } else {
+                    sys_kill(mpd.mpd_endpoint, SIGCONT);
+                }
                 // if (sys_cgptovm(mpd.mpd_endpoint, vm_limit) != OK)
                 //     return;
             }

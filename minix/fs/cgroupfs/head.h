@@ -9,6 +9,7 @@
 #include <minix/procfs.h>
 #include <minix/const.h>
 #include <assert.h>
+#include <sys/signal.h>
 
 #include <machine/archtypes.h>
 #include "const.h"
