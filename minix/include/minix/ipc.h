@@ -2409,6 +2409,13 @@ typedef struct {
 } mess_lsys_cgp_vm_info;   /* Cgroupfs to vm */
 _ASSERT_MSG_SIZE(mess_lsys_cgp_vm_info);
 
+typedef struct {
+	endpoint_t proc;
+	int state;
+
+	uint8_t padding[48];
+} mess_lsys_cgp_pm_info;   /* Cgroupfs to pm */
+
 typedef struct noxfer_message {
 	endpoint_t m_source;		/* who sent the message */
 	int m_type;			/* what kind of message is it */
@@ -2676,6 +2683,7 @@ typedef struct noxfer_message {
 		mess_vmmcp		m_vmmcp;
 		mess_vmmcp_reply	m_vmmcp_reply;
 		mess_lsys_cgp_vm_info m_lsys_cgp_vm_info;
+		mess_lsys_cgp_pm_info m_lsys_cgp_vm_info;
 
 		u8_t size[56];	/* message payload may have 56 bytes at most */
 	};

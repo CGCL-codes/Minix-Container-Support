@@ -853,3 +853,34 @@ sig_send(
 
   return(TRUE);
 }
+
+/*===========================================================================*
+ *			      do_cgpinfo				     *
+ *===========================================================================*/
+int do_cgpinfo(void)
+{
+	endpoint_t target_e;
+	int target_p, state;
+	struct mproc *target_mp;
+	sigset_t set;
+
+	target_e = m_in.m_lsys_cgp_pm_info.proc;
+	state = m_in.m_lsys_cgp_pm_info.state;
+
+	if (pm_isokendpt(target_e, &target_p) != OK)
+		panic("PM got message from invalid endpoint: %d", target_e);
+	target_mp = &mproc[target_p];	/* process slot of target which will be suspended */
+
+	if(state == 0) {
+		target_mp->mp_sigmask2 = target_mp->mp_sigmask;	/* save the old mask */
+		sigemptyset(&set);
+  	target_mp->mp_sigmask = set;
+  	//sigdelset(&mp->mp_sigmask, SIGKILL);
+  	//sigdelset(&mp->mp_sigmask, SIGSTOP);
+  	mp->mp_flags |= SIGSUSPENDED;
+  	check_pending(mp);
+  	//return(SUSPEND);
+	}
+
+	return OK;
+}
