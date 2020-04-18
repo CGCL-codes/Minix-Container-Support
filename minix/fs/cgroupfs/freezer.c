@@ -73,9 +73,9 @@ void freezer_ctl(char * ptr)
             tmp_state[len] = '\0';
 
             if(strcmp(tmp_state, "FROZEN") == 0) {
-                state = 0;
+                state = FROZEN;
             } else {
-                state = 1;
+                state = THAWED;
             }
 
 
@@ -88,10 +88,13 @@ void freezer_ctl(char * ptr)
 
                 if (get_proc_data(pid, &mpd) != OK)
 		            return;
+
+                if (state == FROZEN) {
+                    sys_stop(mpd.mpd_endpoint);
+                } else {
+                    sys_resume(mpd.mpd_endpoint);
+                }
                 
-                
-                if (sys_cgptopm(mpd.mpd_endpoint, state) != OK)
-                    return;
             }
         }
 

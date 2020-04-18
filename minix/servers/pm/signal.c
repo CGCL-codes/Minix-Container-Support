@@ -877,8 +877,8 @@ int do_cgpinfo(void)
   	target_mp->mp_sigmask = set;
   	//sigdelset(&mp->mp_sigmask, SIGKILL);
   	//sigdelset(&mp->mp_sigmask, SIGSTOP);
-  	mp->mp_flags |= SIGSUSPENDED;
-  	check_pending(mp);
+  	target_mp->mp_flags |= SIGSUSPENDED;
+  	check_pending(target_mp);
   	//return(SUSPEND);
 	}
 

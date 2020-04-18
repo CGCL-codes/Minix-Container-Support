@@ -10,13 +10,14 @@
 #include <minix/const.h>
 #include <assert.h>
 #include <sys/signal.h>
+#include <minix/syslib.h>
 
 #include <machine/archtypes.h>
 #include "const.h"
 #include "glo.h"
 #include "proto.h"
 #include "type.h"
-#include "../../include/minix/syslib.h"
+// #include "../../include/minix/syslib.h"
 
 
 #endif /* _PROCFS_HEAD_H */
