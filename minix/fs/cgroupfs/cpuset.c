@@ -46,7 +46,7 @@ void cpuset_ctl(char * ptr)
 {
     int start = 0, mid = 0, end = 0;
     pid_t pid = 0;
-    unsigned cpus;
+    unsigned cpus = 0;
     struct minix_proc_data mpd;
 
     for(start = 0;; end++) {
@@ -73,8 +73,8 @@ void cpuset_ctl(char * ptr)
             tmp_cpus[len] = '\0';
             
             int i = 0, j = 0;
-            while(tmp_cpus[j] != '\0') {
-                if(tmp_cpus[j] != ',') {
+            while(1) {
+                if(tmp_cpus[j] != ',' && tmp_cpus[j] != '\0') {
                     j++;
                     continue;
                 }
@@ -87,6 +87,10 @@ void cpuset_ctl(char * ptr)
                     continue;
                 }
                 cpus = cpus | (1 << cpu);
+
+                if(tmp_cpus[j] == '\0') {
+                    break;
+                }
 
                 j++;
                 i = j;
