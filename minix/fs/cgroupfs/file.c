@@ -15,17 +15,6 @@ ssize_t read_hook(struct inode *inode, char *ptr, size_t len, off_t off,
     parent = get_parent_inode(inode);
     parent_index = get_inode_index(parent);
 
-    // switch (parent_index)
-    // {
-    // case MEMORY_CGROUP:
-        
-    //     buf_read(data[MEMORY_CGROUP], sizeof(char) * strlen(data[MEMORY_CGROUP]));
-    //     break;
-    
-    // default:
-    //     break;
-    // }
-
     buf_read(data[parent_index], sizeof(char) * strlen(data[parent_index]));
 
     return buf_result();
@@ -59,6 +48,18 @@ ssize_t write_hook(struct inode *inode, char *ptr, size_t max,
         
         buf_write(ptr, data[FREEZER_CGROUP], max, off);
         freezer_ctl(data[FREEZER_CGROUP]);
+        break;
+    
+    case CPU_CGROUP:
+
+        buf_write(ptr, data[CPU_CGROUP], max, off);
+        cpu_ctl(data[CPU_CGROUP]);
+        break;
+    
+    case CPUSET_CGROUP:
+
+        buf_write(ptr, data[CPUSET_CGROUP], max, off);
+        cpuset_ctl(data[CPUSET_CGROUP]);
         break;
     
     default:

@@ -25,6 +25,10 @@ static void init_hook(void)
 
         freezer_cgroup_init(root);
 
+        cpu_cgroup_init(root);
+
+        cpuset_cgroup_init(root);
+
         first_time = FALSE;
     }
 }

@@ -2,7 +2,7 @@
 .include <bsd.own.mk>
 
 PROG= cgroupfs
-SRCS= buf.c file.c main.c memory.c freezer.c
+SRCS= buf.c file.c main.c memory.c freezer.c cpu.c cpuset.c
 
 # CPPFLAGS+= -I${NETBSDSRCDIR}/minix
 # CPPFLAGS+= -I${NETBSDSRCDIR}/minix/fs
