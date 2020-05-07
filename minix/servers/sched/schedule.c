@@ -302,9 +302,9 @@ int do_cgroup_cpu_info(message *m_ptr)
 	int proc_nr_n, cpu_shares;
 
 	/* Find proc slot */
-	if (sched_isokendpt(m_ptr->m_lsys_cgp_sched_info.endpoint, &proc_nr_n) != OK) {
+	if (sched_isokendpt(m_ptr->m_lsys_cgp_sched_info.proc, &proc_nr_n) != OK) {
 		printf("SCHED: WARNING: got an invalid endpoint in OoQ msg "
-		"%d\n", m_ptr->m_lsys_cgp_sched_info.endpoint);
+		"%d\n", m_ptr->m_lsys_cgp_sched_info.proc);
 		return EBADEPT;
 	}
 
@@ -326,19 +326,20 @@ int do_cgroup_cpuset_info(message *m_ptr)
 	int proc_nr_n;
 	unsigned cpus;
 
-	if (sched_isokendpt(m_ptr->m_lsys_cgp_sched_info.endpoint, &proc_nr_n) != OK) {
+	if (sched_isokendpt(m_ptr->m_lsys_cgp_sched_info.proc, &proc_nr_n) != OK) {
 		printf("SCHED: WARNING: got an invalid endpoint in OoQ msg "
-		"%d\n", m_ptr->m_lsys_cgp_sched_info.endpoint);
+		"%d\n", m_ptr->m_lsys_cgp_sched_info.proc);
 		return EBADEPT;
 	}
 
 	rmp = &schedproc[proc_nr_n];
 	cpus = m_ptr->m_lsys_cgp_sched_info.cpus;
-	rmp->cpu_mask = 0;
+	
 
 	/* Update cpu_mask */
 	for(int i = 0; i < 16; i++) {
-		if((cpus >> i) & 1 == 1) {
+		UNSET_BIT(rmp->cpu_mask, i);
+		if(((cpus >> i) & 1) == 1) {
 			SET_BIT(rmp->cpu_mask, i);
 		}
 	}
