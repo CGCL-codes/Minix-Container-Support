@@ -82,6 +82,12 @@ int main(void)
 				result = EPERM;
 			}
 			break;
+		case SCHEDULING_CGROUP_CPU_INFO:
+			result = do_cgroup_cpu_info(&m_in);
+			break;
+		case SCHEDULING_CGROUP_CPUSET_INFO:
+			result = do_cgroup_cpuset_info(&m_in);
+			break;
 		default:
 			result = no_sys(who_e, call_nr);
 		}

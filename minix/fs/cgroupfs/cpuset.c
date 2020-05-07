@@ -106,11 +106,9 @@ void cpuset_ctl(char * ptr)
                 if (get_proc_data(pid, &mpd) != OK)
 		            return;
 
-                // if (state == FROZEN) {
-                //     sys_stop(mpd.mpd_endpoint);
-                // } else {
-                //     sys_resume(mpd.mpd_endpoint);
-                // }
+                if (sys_cgptosched(mpd.mpd_endpoint, -1, cpus) != OK) {
+                    return;
+                }
                 
             }
         }
