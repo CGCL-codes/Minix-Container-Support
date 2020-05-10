@@ -42,6 +42,8 @@ static int schedule_process(struct schedproc * rmp, unsigned flags);
 
 #define DEFAULT_CPU_SHARES		1024
 
+#define MAX_NUM_CPUS			16
+
 /* processes created by RS are sysytem processes */
 #define is_system_proc(p)	((p)->parent == RS_PROC_NR)
 
@@ -165,6 +167,11 @@ int do_start_scheduling(message *m_ptr)
 	rmp->max_priority = m_ptr->m_lsys_sched_scheduling_start.maxprio;
 	if (rmp->max_priority >= NR_SCHED_QUEUES) {
 		return EINVAL;
+	}
+
+	/* Initialize cpu_mask */
+	for(int i = 0; i < MAX_NUM_CPUS; i++) {
+		SET_BIT(rmp->cpu_mask, i);
 	}
 
 	/* Inherit current priority and time slice from parent. Since there
@@ -312,7 +319,7 @@ int do_cgroup_cpu_info(message *m_ptr)
 	cpu_shares = m_ptr->m_lsys_cgp_sched_info.cpu_shares;
 	rmp->cpu_shares = cpu_shares;
 
-	rmp->time_slice = (cpu_shares / DEFAULT_CPU_SHARES) * DEFAULT_USER_TIME_SLICE;
+	rmp->time_slice = (cpu_shares * 1.0 / DEFAULT_CPU_SHARES) * DEFAULT_USER_TIME_SLICE;
 
 	return OK;
 }
@@ -337,7 +344,7 @@ int do_cgroup_cpuset_info(message *m_ptr)
 	
 
 	/* Update cpu_mask */
-	for(int i = 0; i < 16; i++) {
+	for(int i = 0; i < MAX_NUM_CPUS; i++) {
 		UNSET_BIT(rmp->cpu_mask, i);
 		if(((cpus >> i) & 1) == 1) {
 			SET_BIT(rmp->cpu_mask, i);
