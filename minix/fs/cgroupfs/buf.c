@@ -22,13 +22,6 @@ void buf_init(char * ptr, size_t len, off_t start)
 	used = 0;
 }
 
-// /*
-//  * Initialize write buffer
-//  */
-// void buf_write_init(char * ptr, size_t len, off_t start, char * dest_data)
-// {
-
-// }
 
 /*
  * Load data to the destination place

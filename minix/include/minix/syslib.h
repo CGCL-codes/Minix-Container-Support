@@ -75,6 +75,8 @@ int sys_vmctl_set_addrspace(endpoint_t who, phys_bytes ptroot, void
 
 /* System calls for passing cgroup information to servers */
 int sys_cgptovm(endpoint_t proc, vir_bytes vm_limit);
+int sys_cgptopm(endpoint_t proc, int state);
+int sys_cgptosched(endpoint_t proc, int cpu_shares, unsigned cpus);
 
 
 /* Shorthands for sys_sdevio() system call. */

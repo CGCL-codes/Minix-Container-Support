@@ -13,10 +13,22 @@
 /* Size of the I/O buffer and the str storing file content. */
 #define BUF_SIZE	4097			/* 4KB+1 (see buf.c) */
 #define STR_SIZE    1024*5         /* 5KB */
-#define NR_SUBSYSTEMS   1
+#define NR_SUBSYSTEMS   4
 
 /* Directory index */
 #define MEMORY_CGROUP   0
+#define FREEZER_CGROUP  1
+#define CPU_CGROUP      2
+#define CPUSET_CGROUP   3
+
+#define FROZEN 0
+#define THAWED 1
+
+#define CPU_SHARES_UPPER_BOUND 4096
+#define CPU_SHARES_LOWER_BOUND 256
+#define CPU_SHARES_DEFAULT     1024
+
+#define CPUS_DEFAULT           (1 << 16) - 1
 
 
 #endif /* _CGROUPFS_CONST_H */

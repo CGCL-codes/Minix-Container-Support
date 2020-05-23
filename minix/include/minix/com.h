@@ -809,6 +809,8 @@
 #define SCHEDULING_STOP		(SCHEDULING_BASE+3)
 #define SCHEDULING_SET_NICE	(SCHEDULING_BASE+4)
 #define SCHEDULING_INHERIT	(SCHEDULING_BASE+5)
+#define SCHEDULING_CGROUP_CPU_INFO		(SCHEDULING_BASE+6)
+#define SCHEDULING_CGROUP_CPUSET_INFO	(SCHEDULING_BASE+7)
 
 /*===========================================================================*
  *              Messages for USB                                             *

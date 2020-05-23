@@ -13,6 +13,8 @@ int do_stop_scheduling(message *m_ptr);
 int do_nice(message *m_ptr);
 void init_scheduling(void);
 void balance_queues(void);
+int do_cgroup_cpu_info(message *m_ptr);
+int do_cgroup_cpuset_info(message *m_ptr);
 
 /* utility.c */
 int no_sys(int who_e, int call_nr);

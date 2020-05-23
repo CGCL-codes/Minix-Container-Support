@@ -73,6 +73,7 @@ int do_sigreturn(void);
 int do_sigsuspend(void);
 void check_pending(struct mproc *rmp);
 void restart_sigs(struct mproc *rmp);
+int do_cgpinfo(void);
 
 /* time.c */
 int do_stime(void);

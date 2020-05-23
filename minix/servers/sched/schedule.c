@@ -40,6 +40,10 @@ static int schedule_process(struct schedproc * rmp, unsigned flags);
 
 #define DEFAULT_USER_TIME_SLICE 200
 
+#define DEFAULT_CPU_SHARES		1024
+
+#define MAX_NUM_CPUS			16
+
 /* processes created by RS are sysytem processes */
 #define is_system_proc(p)	((p)->parent == RS_PROC_NR)
 
@@ -68,7 +72,7 @@ static void pick_cpu(struct schedproc * proc)
 		/* skip dead cpus */
 		if (!cpu_is_available(c))
 			continue;
-		if (c != machine.bsp_id && cpu_load > cpu_proc[c]) {
+		if (c != machine.bsp_id && cpu_load > cpu_proc[c] && GET_BIT(proc->cpu_mask, c) == 1) {
 			cpu_load = cpu_proc[c];
 			cpu = c;
 		}
@@ -163,6 +167,11 @@ int do_start_scheduling(message *m_ptr)
 	rmp->max_priority = m_ptr->m_lsys_sched_scheduling_start.maxprio;
 	if (rmp->max_priority >= NR_SCHED_QUEUES) {
 		return EINVAL;
+	}
+
+	/* Initialize cpu_mask */
+	for(int i = 0; i < MAX_NUM_CPUS; i++) {
+		SET_BIT(rmp->cpu_mask, i);
 	}
 
 	/* Inherit current priority and time slice from parent. Since there
@@ -289,6 +298,61 @@ int do_nice(message *m_ptr)
 	}
 
 	return rv;
+}
+
+/*===========================================================================*
+ *				do_cgroup_cpu_info					     *
+ *===========================================================================*/
+int do_cgroup_cpu_info(message *m_ptr)
+{
+	struct schedproc *rmp;
+	int proc_nr_n, cpu_shares;
+
+	/* Find proc slot */
+	if (sched_isokendpt(m_ptr->m_lsys_cgp_sched_info.proc, &proc_nr_n) != OK) {
+		printf("SCHED: WARNING: got an invalid endpoint in OoQ msg "
+		"%d\n", m_ptr->m_lsys_cgp_sched_info.proc);
+		return EBADEPT;
+	}
+
+	rmp = &schedproc[proc_nr_n];
+	cpu_shares = m_ptr->m_lsys_cgp_sched_info.cpu_shares;
+	rmp->cpu_shares = cpu_shares;
+
+	rmp->time_slice = (cpu_shares * 1.0 / DEFAULT_CPU_SHARES) * DEFAULT_USER_TIME_SLICE;
+
+	return OK;
+}
+
+/*===========================================================================*
+ *				do_cgroup_cpuset_info					     *
+ *===========================================================================*/
+int do_cgroup_cpuset_info(message *m_ptr)
+{
+	struct schedproc *rmp;
+	int proc_nr_n;
+	unsigned cpus;
+
+	if (sched_isokendpt(m_ptr->m_lsys_cgp_sched_info.proc, &proc_nr_n) != OK) {
+		printf("SCHED: WARNING: got an invalid endpoint in OoQ msg "
+		"%d\n", m_ptr->m_lsys_cgp_sched_info.proc);
+		return EBADEPT;
+	}
+
+	rmp = &schedproc[proc_nr_n];
+	cpus = m_ptr->m_lsys_cgp_sched_info.cpus;
+	
+
+	/* Update cpu_mask */
+	for(int i = 0; i < MAX_NUM_CPUS; i++) {
+		UNSET_BIT(rmp->cpu_mask, i);
+		if(((cpus >> i) & 1) == 1) {
+			SET_BIT(rmp->cpu_mask, i);
+		}
+	}
+
+	int res = schedule_process_migrate(rmp);
+	return res;
 }
 
 /*===========================================================================*
