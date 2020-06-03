@@ -1172,8 +1172,11 @@ typedef struct {
 	endpoint_t endpt;
 	endpoint_t slot;
 	uint32_t flags;
+	uint32_t clone_flags;
+	uint32_t stack_addr;
+	uint32_t type;
 
-	uint8_t padding[44];
+	uint8_t padding[36];
 } mess_lsys_krn_sys_fork;
 _ASSERT_MSG_SIZE(mess_lsys_krn_sys_fork);
 
