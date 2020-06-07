@@ -1176,7 +1176,7 @@ typedef struct {
 	uint32_t stack_addr;
 	uint32_t type;
 
-	uint8_t padding[36];
+	uint8_t padding[32];
 } mess_lsys_krn_sys_fork;
 _ASSERT_MSG_SIZE(mess_lsys_krn_sys_fork);
 

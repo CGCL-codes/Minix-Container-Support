@@ -14,5 +14,6 @@ pid_t fork(void)
   message m;
 
   memset(&m, 0, sizeof(m));
+  m.m_lsys_krn_sys_fork.type = TYPE_FORK;
   return(_syscall(PM_PROC_NR, PM_FORK, &m));
 }
