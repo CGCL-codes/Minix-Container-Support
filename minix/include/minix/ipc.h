@@ -36,9 +36,10 @@ _ASSERT_MSG_SIZE(mess_u64);
 
 typedef struct {
 	uint64_t m1ull1;
+	uint32_t m1u1, m1u2, m1u3;
 	int m1i1, m1i2, m1i3;
 	char *m1p1, *m1p2, *m1p3, *m1p4;
-	uint8_t padding[20];
+	uint8_t padding[8];
 } mess_1;
 _ASSERT_MSG_SIZE(mess_1);
 
@@ -2429,6 +2430,15 @@ typedef struct {
 } mess_lsys_cgp_sched_info;   /* Cgroupfs to sched */
 _ASSERT_MSG_SIZE(mess_lsys_cgp_sched_info);
 
+typedef struct {
+	uint32_t clone_flags;
+	uint32_t stack_addr;
+	uint32_t type;
+
+	uint8_t padding[44];
+} mess_lc_pm_clone;			/* Used in clone() */
+_ASSERT_MSG_SIZE(mess_lc_pm_clone);
+
 typedef struct noxfer_message {
 	endpoint_t m_source;		/* who sent the message */
 	int m_type;			/* what kind of message is it */
@@ -2698,6 +2708,7 @@ typedef struct noxfer_message {
 		mess_lsys_cgp_vm_info	m_lsys_cgp_vm_info;
 		mess_lsys_cgp_pm_info	m_lsys_cgp_pm_info;
 		mess_lsys_cgp_sched_info	m_lsys_cgp_sched_info;
+		mess_lc_pm_clone 		m_lc_pm_clone;
 
 		u8_t size[56];	/* message payload may have 56 bytes at most */
 	};
@@ -2715,6 +2726,9 @@ typedef int _ASSERT_message[/* CONSTCOND */sizeof(message) == 64 ? 1 : -1];
 #define m1_p3  m_m1.m1p3
 #define m1_p4  m_m1.m1p4
 #define m1_ull1  m_m1.m1ull1
+#define m1_u1  m_m1.m1u1
+#define m1_u2  m_m1.m1u2
+#define m1_u3  m_m1.m1u3
 
 #define m2_ll1  m_m2.m2ll1
 #define m2_i1  m_m2.m2i1

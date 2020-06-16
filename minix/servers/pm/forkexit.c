@@ -75,7 +75,7 @@ do_fork(void)
 	panic("do_fork finds wrong child slot: %d", next_child);
 
   /* Memory part of the forking. */
-  if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep)) != OK) {
+  if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep, m_in.m_lc_pm_clone.clone_flags, m_in.m_lc_pm_clone.stack_addr, m_in.m_lc_pm_clone.type)) != OK) {
 	return s;
   }
 
