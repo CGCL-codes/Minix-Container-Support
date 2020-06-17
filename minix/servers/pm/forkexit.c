@@ -180,7 +180,7 @@ do_srv_fork(void)
   if(next_child >= NR_PROCS || (mproc[next_child].mp_flags & IN_USE))
 	panic("do_fork finds wrong child slot: %d", next_child);
 
-  if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep)) != OK) {
+  if((s=vm_fork(rmp->mp_endpoint, next_child, &child_ep, 0, 0, 0)) != OK) {
 	return s;
   }
 
