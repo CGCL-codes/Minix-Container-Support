@@ -32,7 +32,7 @@ int sys_enable_iop(endpoint_t proc_ep);
 int sys_exec(endpoint_t proc_ep, vir_bytes stack_ptr, vir_bytes progname,
 	vir_bytes pc, vir_bytes ps_str);
 int sys_fork(endpoint_t parent, endpoint_t child, endpoint_t *, 
-	u32_t vm, vir_bytes *);
+	u32_t vm, vir_bytes *, uint32_t clone_flags, uint32_t stack_addr, uint32_t type);
 int sys_clear(endpoint_t proc_ep);
 int sys_exit(void);
 int sys_trace(int req, endpoint_t proc_ep, long addr, long *data_p);

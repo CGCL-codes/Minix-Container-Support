@@ -7,7 +7,7 @@
 #include <minix/endpoint.h>
 
 int vm_exit(endpoint_t ep);
-int vm_fork(endpoint_t ep, int slotno, endpoint_t *child_ep);
+int vm_fork(endpoint_t ep, int slotno, endpoint_t *child_ep, uint32_t clone_flags, uint32_t stack_addr, uint32_t type);
 int vm_getrusage(endpoint_t endpt, void *addr, int children);
 int vm_willexit(endpoint_t ep);
 int vm_adddma(endpoint_t proc_e, phys_bytes start, phys_bytes size);

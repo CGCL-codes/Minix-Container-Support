@@ -71,6 +71,13 @@ int do_fork(struct proc * caller, message * m_ptr)
   rpc->p_nr = m_ptr->m_lsys_krn_sys_fork.slot;	/* this was obliterated by copy */
   rpc->p_endpoint = _ENDPOINT(gen, rpc->p_nr);	/* new endpoint of slot */
 
+  /* set up stack addr for clone() */
+  /*if(m_ptr->m_lsys_krn_sys_fork.type == TYPE_CLONE) {
+    if(m_ptr->m_lsys_krn_sys_fork.stack_addr) {
+      rpc->p_reg.sp = m_ptr->m_lsys_krn_sys_fork.stack_addr;
+    }
+  }*/
+
   rpc->p_reg.retreg = 0;	/* child sees pid = 0 to know it is child */
   rpc->p_user_time = 0;		/* set all the accounting times to 0 */
   rpc->p_sys_time = 0;

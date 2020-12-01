@@ -633,6 +633,9 @@
 #	define VMF_ENDPOINT		m1_i1
 #	define VMF_SLOTNO		m1_i2
 #	define VMF_CHILD_ENDPOINT	m1_i3	/* result */
+#	define VMF_CLONE_FLAGS  m1_u1
+#   define VMF_STACK_ADDR	m1_u2
+#	define VMF_TYPE			m1_u3
 #define VM_BRK			(VM_RQ_BASE+2)
 #define VM_EXEC_NEWMEM		(VM_RQ_BASE+3)
 #	define VMEN_ENDPOINT		m1_i1

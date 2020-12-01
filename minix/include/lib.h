@@ -49,4 +49,7 @@ ssize_t _vectorio_setup(const struct iovec * iov, int iovcnt, char ** ptr,
 void _vectorio_cleanup(const struct iovec * iov, int iovcnt, char * buffer,
 	ssize_t r, int op);
 
+#define TYPE_FORK  0
+#define TYPE_CLONE 1
+
 #endif /* _LIB_H */

@@ -278,6 +278,9 @@ struct proc {
 #define isusern(n)        ((n) >= 0)
 #define isrootsysn(n)	  ((n) == ROOT_SYS_PROC_NR)
 
+#define TYPE_FORK  0
+#define TYPE_CLONE 1
+
 #ifndef __ASSEMBLY__
 
 EXTERN struct proc proc[NR_TASKS + NR_PROCS];	/* process table */
