@@ -574,7 +574,7 @@ pm_reboot(void)
 /*===========================================================================*
  *				pm_fork					     *
  *===========================================================================*/
-void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid)
+void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
 {
 /* Perform those aspects of the fork() system call that relate to files.
  * In particular, let the child inherit its parent's file descriptors.
@@ -587,6 +587,8 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid)
 #endif /* !defined(NDEBUG) */
   int i, parentno, childno;
   mutex_t c_fp_lock;
+  
+  printf("new_mntns_flag: %d\n", new_mntns_flag);
 
   /* Check up-to-dateness of fproc. */
   okendpt(pproc, &parentno);

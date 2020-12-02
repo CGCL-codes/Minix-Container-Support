@@ -854,14 +854,16 @@ static void service_pm(void)
 		pid_t child_pid;
 		uid_t reuid;
 		gid_t regid;
+		int new_mntns_flag;
 
 		pproc_e = m_in.VFS_PM_PENDPT;
 		proc_e = m_in.VFS_PM_ENDPT;
 		child_pid = m_in.VFS_PM_CPID;
 		reuid = m_in.VFS_PM_REUID;
 		regid = m_in.VFS_PM_REGID;
+		new_mntns_flag = m_in.VFS_PM_MNTNS;
 
-		pm_fork(pproc_e, proc_e, child_pid);
+		pm_fork(pproc_e, proc_e, child_pid, new_mntns_flag);
 		m_out.m_type = VFS_PM_FORK_REPLY;
 
 		if (call_nr == VFS_PM_SRV_FORK) {

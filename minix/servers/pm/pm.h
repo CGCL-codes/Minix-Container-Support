@@ -20,6 +20,8 @@
 #include <limits.h>
 #include <errno.h>
 #include <sys/param.h>
+#include <lib.h>
+#include <sched.h>
 
 #include "const.h"
 #include "type.h"

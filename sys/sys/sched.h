@@ -195,6 +195,9 @@ struct schedstate_percpu {
 						   child */
 #define	CLONE_VFORK		0x00004000	/* parent blocks until child
 						   exits */
+#define CLONE_NEWNS			0x00020000	/* New mount namespace group */
+#define CLONE_NEWUTS		0x04000000	/* New utsname namespace */
+#define CLONE_NEWPID		0x20000000	/* New pid namespace */
 
 #endif /* _NETBSD_SOURCE */
 
