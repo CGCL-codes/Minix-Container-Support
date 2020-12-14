@@ -126,7 +126,7 @@ do_fork(void)
   m.VFS_PM_CPID = rmc->mp_pid;
   m.VFS_PM_REUID = -1;	/* Not used by VFS_PM_FORK */
   m.VFS_PM_REGID = -1;	/* Not used by VFS_PM_FORK */
-  if (rmp->type == TYPE_CLONE && rmp->clone_flags & CLONE_NEWNS == CLONE_NEWNS) {
+  if (rmp->type == TYPE_CLONE && (rmp->clone_flags & CLONE_NEWNS) == CLONE_NEWNS) {
     m.VFS_PM_MNTNS = 1;
   } else {
     m.VFS_PM_MNTNS = -1;

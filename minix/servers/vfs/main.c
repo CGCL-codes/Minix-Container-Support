@@ -395,16 +395,20 @@ static int sef_cb_init_fresh(int UNUSED(type), sef_init_info_t *info)
 /* Initialize the virtual file server. */
   int s, i;
   struct fproc *rfp;
+  struct mnt_namespace *ptr_mnt_ns = &mnt_ns;
   message mess;
   struct rprocpub rprocpub[NR_BOOT_PROCS];
 
   self = NULL;
   verbose = 0;
+  ptr_mnt_ns->vmnt_array_ptr = vmnt;
 
   /* Initialize proc endpoints to NONE */
   for (rfp = &fproc[0]; rfp < &fproc[NR_PROCS]; rfp++) {
 	rfp->fp_endpoint = NONE;
 	rfp->fp_pid = PID_FREE;
+	rfp->mnt_ns = ptr_mnt_ns;
+	rfp->new_mntns_flag = -1;
   }
 
   /* Initialize the process table with help of the process manager messages.

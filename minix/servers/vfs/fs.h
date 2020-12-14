@@ -39,5 +39,6 @@
 #include "type.h"
 #include "vmnt.h"
 #include "fproc.h"
+#include "namespace.h"
 
 #endif

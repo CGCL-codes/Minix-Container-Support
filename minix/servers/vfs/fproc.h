@@ -73,6 +73,8 @@ EXTERN struct fproc {
   void (*fp_func)(void);		/* handler function for pending work */
   message fp_msg;		/* pending or active message from process */
   message fp_pm_msg;		/* pending/active postponed PM request */
+  struct mnt_namespace *mnt_ns;
+  int new_mntns_flag;
 
   char fp_name[PROC_NAME_LEN];	/* Last exec() */
 #if LOCK_DEBUG

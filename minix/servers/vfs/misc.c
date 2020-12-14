@@ -588,7 +588,6 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
   int i, parentno, childno;
   mutex_t c_fp_lock;
   
-  printf("new_mntns_flag: %d\n", new_mntns_flag);
 
   /* Check up-to-dateness of fproc. */
   okendpt(pproc, &parentno);
@@ -617,6 +616,11 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
 
   for (i = 0; i < OPEN_MAX; i++)
 	if (cp->fp_filp[i] != NULL) cp->fp_filp[i]->filp_count++;
+  
+  /* Clone new ns */
+  if (new_mntns_flag == 1) {
+	  clone_newns(parentno, childno);
+  }
 
   /* Fill in new process and endpoint id. */
   cp->fp_pid = cpid;
@@ -660,6 +664,12 @@ static void free_proc(int flags)
   /* Release root and working directories. */
   if (fp->fp_rd) { put_vnode(fp->fp_rd); fp->fp_rd = NULL; }
   if (fp->fp_wd) { put_vnode(fp->fp_wd); fp->fp_wd = NULL; }
+
+  /* Release vmnt arrays in fproc table */
+  if (fp->new_mntns_flag == 1) {
+	  free(fp->mnt_ns->vmnt_array_ptr);
+	  free(fp->mnt_ns);
+  }
 
   /* The rest of these actions is only done when processes actually exit. */
   if (!(flags & FP_EXITING)) return;
@@ -1005,4 +1015,53 @@ int do_getrusage(void)
 	 * program directly.  TODO: remove this call after the next release.
 	 */
 	return OK;
+}
+
+void clone_newns(int parentno, int childno) {
+
+	/* pointer to child proc and parent proc */
+	struct fproc *cp = &fproc[childno];
+	struct fproc *pp = &fproc[parentno];
+
+	struct mnt_namespace *mntns_ptr = (struct mnt_namespace *) malloc(sizeof(struct mnt_namespace));
+	if (mntns_ptr == NULL) {
+		printf("malloc mnt_namespace failed\n");
+		return;
+	}
+	cp->mnt_ns = mntns_ptr;
+
+	struct vmnt *vmnt_array_ptr = (struct vmnt *) malloc(NR_MNTS * sizeof(struct vmnt));
+	if (vmnt_array_ptr == NULL) {
+		printf("malloc vmnt array failed\n");
+		return;
+	}
+	cp->mnt_ns->vmnt_array_ptr = vmnt_array_ptr;
+	cp->new_mntns_flag = 1;
+
+	clone_vmnt_array(parentno, childno);
+}
+
+void clone_vmnt_array(parentno, childno) {
+	struct fproc *cp = &fproc[childno];
+	struct fproc *pp = &fproc[parentno];
+
+	struct vmnt *vmnt_ptr_child = cp->mnt_ns->vmnt_array_ptr;
+	struct vmnt *vmnt_ptr_parent = pp->mnt_ns->vmnt_array_ptr;
+
+	for (int i = 0; i < NR_MNTS; i++, vmnt_ptr_child++, vmnt_ptr_parent++) {
+		vmnt_ptr_child->m_fs_e = vmnt_ptr_parent->m_fs_e;
+		vmnt_ptr_child->m_lock = vmnt_ptr_parent->m_lock;
+		vmnt_ptr_child->m_comm = vmnt_ptr_parent->m_comm;
+		vmnt_ptr_child->m_dev = vmnt_ptr_parent->m_dev;
+		vmnt_ptr_child->m_flags = vmnt_ptr_parent->m_flags;
+		vmnt_ptr_child->m_fs_flags = vmnt_ptr_parent->m_fs_flags;
+		vmnt_ptr_child->m_mounted_on = vmnt_ptr_parent->m_mounted_on;
+		vmnt_ptr_child->m_root_node = vmnt_ptr_parent->m_root_node;
+		vmnt_ptr_child->m_stats = vmnt_ptr_parent->m_stats;
+
+		strlcpy(vmnt_ptr_child->m_mount_path, vmnt_ptr_parent->m_mount_path, PATH_MAX);
+		strlcpy(vmnt_ptr_child->m_label, vmnt_ptr_parent->m_label, LABEL_MAX);
+		strlcpy(vmnt_ptr_child->m_mount_dev, vmnt_ptr_parent->m_mount_dev, PATH_MAX);
+		strlcpy(vmnt_ptr_child->m_fstype, vmnt_ptr_parent->m_fstype, FSTYPE_MAX);
+	}
 }
