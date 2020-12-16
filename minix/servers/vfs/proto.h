@@ -135,6 +135,9 @@ int pm_dumpcore(int sig, vir_bytes exe_name);
 void ds_event(void);
 int dupvm(struct fproc *fp, int pfd, int *vmfd, struct filp **f);
 int do_getrusage(void);
+void clone_newns(int parentno, int childno);
+void clone_vmnt_array(int parentno, int childno);
+
 
 /* mount.c */
 int do_mount(void);

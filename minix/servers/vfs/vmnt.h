@@ -4,7 +4,7 @@
 #include "tll.h"
 #include "type.h"
 
-typedef struct vmnt {
+EXTERN struct vmnt {
   int m_fs_e;			/* FS process' kernel endpoint */
   tll_t m_lock;
   comm_t m_comm;
@@ -18,9 +18,8 @@ typedef struct vmnt {
   char m_mount_dev[PATH_MAX];	/* device from which vmnt is mounted */
   char m_fstype[FSTYPE_MAX];	/* file system type */
   struct statvfs_cache m_stats;	/* cached file system statistics */
-};
+} vmnt[NR_MNTS];
 
-EXTERN struct vmnt vmnt[NR_MNTS];
 
 /* vmnt flags */
 #define VMNT_READONLY		01	/* Device mounted readonly */

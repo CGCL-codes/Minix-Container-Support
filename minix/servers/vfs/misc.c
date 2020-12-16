@@ -1021,7 +1021,7 @@ void clone_newns(int parentno, int childno) {
 
 	/* pointer to child proc and parent proc */
 	struct fproc *cp = &fproc[childno];
-	struct fproc *pp = &fproc[parentno];
+	//struct fproc *pp = &fproc[parentno];
 
 	struct mnt_namespace *mntns_ptr = (struct mnt_namespace *) malloc(sizeof(struct mnt_namespace));
 	if (mntns_ptr == NULL) {
@@ -1041,7 +1041,7 @@ void clone_newns(int parentno, int childno) {
 	clone_vmnt_array(parentno, childno);
 }
 
-void clone_vmnt_array(parentno, childno) {
+void clone_vmnt_array(int parentno, int childno) {
 	struct fproc *cp = &fproc[childno];
 	struct fproc *pp = &fproc[parentno];
 
