@@ -407,7 +407,7 @@ int do_getvfsstat(void)
 	}
   } else {
 	/* Just report a file system count.  No need to lock, as above. */
-	for (vmp = fpp->mnt_ns->vmnt_array_ptr; vmp < fpp->mnt_ns->vmnt_array_ptr + NR_MNTS; vmp++) {
+	for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; vmp++) {
 		if (vmp->m_dev != NO_DEV && (vmp->m_flags & VMNT_CANSTAT))
 			count++;
 	}
