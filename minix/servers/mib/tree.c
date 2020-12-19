@@ -1112,6 +1112,9 @@ mib_getptr(struct mib_node * node)
 			return &node->node_quad;
 		break;
 	case CTLTYPE_STRING:
+		if(node->node_name == "hostname" && node->utsid !=0){
+			return hostname2[node->utsid];
+		}
 	case CTLTYPE_STRUCT:
 		if (node->node_flags & CTLFLAG_IMMEDIATE)
 			return NULL;
@@ -1153,6 +1156,43 @@ mib_read(struct mib_node * node, struct mib_oldp * oldp)
 	return (ssize_t)oldlen;
 }
 
+/* clone create new namespaces */
+int createnewuts(int pid, int c_endpoint){
+	int maxUTSid =0;
+	int emptyIndex =0;
+	int utsspaces[MAXUTSSPACES] ={0};
+
+	for (size_t i = 1; i < MAXUTSSPACES; i++)
+	{
+		if(_proc_uts[i].endpoint_int ==0 && _proc_uts[i].utsid ==0){
+			if(emptyIndex ==0) emptyIndex = i;
+		}else{
+			utsspaces[_proc_uts[i].utsid] = 1;
+		}
+	}
+
+	int i =1;
+	while (utsspaces[i] !=0 && i < MAXUTSSPACES) i++;
+
+	if(_proc_uts[pid].utsid ==0){
+		for(size_t j=0; hostname[j]!='\0';j++){
+			hostname2[i][j] = hostname[j];
+		}
+
+	}else{
+		for (size_t j = 0; hostname2[pid][j] != '\0'; j++)
+		{
+			hostname2[i][j] = hostname2[pid][j];
+		}
+	}
+
+	_proc_uts[emptyIndex].endpoint_int = c_endpoint;
+	_proc_uts[emptyIndex].utsid = i;
+	
+	return i;
+
+}
+
 /*
  * Write new data into a regular data node, if requested.
  */
@@ -1164,6 +1204,13 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	char *src, *dst;
 	size_t newlen;
 	int r;
+
+	/* clone for hostname */
+	if(call->call_utscendpt !=0){
+		int cid = createnewuts(node->utsid, call->call_utscendpt);
+		return 0;
+	}
+
 
 	if (newp == NULL)
 		return OK; /* nothing to do */
@@ -1300,6 +1347,18 @@ mib_write(struct mib_call * call, struct mib_node * node,
 }
 
 /*
+* get uts index from process endpoint
+*/
+int uts_getid(int p_endpoint){
+	for(int i = 1; i<MAXUTSSPACES; i++){
+		if(_proc_uts[i].endpoint_int == p_endpoint){
+			return _proc_uts[i].utsid;
+		}
+	}
+	return 0;
+}
+
+/*
  * Read and/or write the value of a regular data node.  A regular data node is
  * a leaf node.  Typically, a leaf node has no associated function, in which
  * case this function will be used instead.  In addition, this function may be
@@ -1311,6 +1370,10 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 {
 	ssize_t len;
 	int r;
+
+	if(node->node_name == "hostname"){
+		node->utsid = uts_getid(call->call_utspendpt);
+	}
 
 	/* Copy out old data, if requested.  Always get the old data length. */
 	if ((r = len = mib_read(node, oldp)) < 0)

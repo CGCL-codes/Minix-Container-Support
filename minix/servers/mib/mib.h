@@ -33,6 +33,12 @@
 struct mib_oldp;
 struct mib_newp;
 
+struct proc_uts{
+	endpoint_t endpoint_int;	/* process endpoint */
+	unsigned int utsid;			/* namespace id */
+}_proc_uts[NR_PROCS];
+
+
 /*
  * This structure contains a number of less heavily used parameters for handler
  * functions, mainly to provide extensibility while limiting argument clutter.
@@ -43,6 +49,9 @@ struct mib_call {
 	unsigned int call_namelen;	/* length of the remaining name part */
 	unsigned int call_flags;	/* internal call processing flags */
 	size_t call_reslen;		/* resulting oldlen value on error */
+
+	endpoint_t call_utspendpt;	/* endpoint of grandparent process */
+	endpoint_t call_utscendpt;	/* endpoint of child process */
 };
 
 /* Call flags. */
@@ -217,6 +226,9 @@ struct mib_node {
 	} node_aux_u;
 	const char *node_name;		/* node name string */
 	const char *node_desc;		/* node description (may be NULL) */
+
+	uint32_t utsid;				/* uts index of grandparent process */
+
 };
 #define node_csize	node_val_u.nvu_child.nvuc_csize
 #define node_clen	node_val_u.nvu_child.nvuc_clen

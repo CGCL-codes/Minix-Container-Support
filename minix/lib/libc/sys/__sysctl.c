@@ -23,6 +23,9 @@ __sysctl(const int * name, unsigned int namelen, void * oldp, size_t * oldlenp,
 	m.m_lc_mib_sysctl.namep = (vir_bytes)name;
 	if (namelen <= CTL_SHORTNAME)
 		memcpy(m.m_lc_mib_sysctl.name, name, sizeof(*name) * namelen);
+	m.m_lc_mib_sysctl.uts_pendpt = getppid();
+	m.m_lc_mib_sysctl.uts_cendpt = 0;
+
 
 	r = _syscall(MIB_PROC_NR, MIB_SYSCTL, &m);
 

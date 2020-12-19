@@ -288,6 +288,7 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	struct mib_call call;
 	ssize_t r;
 
+
 	/* Only handle blocking calls.  Ignore everything else. */
 	if (IPC_STATUS_CALL(ipc_status) != SENDREC)
 		return EDONTREPLY;
@@ -349,6 +350,13 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	call.call_namelen = namelen;
 	call.call_flags = 0;
 	call.call_reslen = 0;
+
+	call.call_utspendpt = m_in->m_lc_mib_sysctl.uts_pendpt;
+	if(m_in->m_lc_mib_sysctl.uts_cendpt !=0){
+		call.call_utscendpt = m_in->m_lc_mib_sysctl.uts_cendpt;
+	}else{
+		call.call_utscendpt = 0;
+	}
 
 	r = mib_dispatch(&call, oldpp, newpp);
 

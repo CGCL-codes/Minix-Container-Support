@@ -430,6 +430,9 @@ typedef struct {
 	unsigned int	namelen;
 	vir_bytes	namep;
 	int		name[CTL_SHORTNAME];
+
+	pid_t uts_pendpt;	/* grandparent process endpoint for uts namespace */
+	pid_t uts_cendpt;	/* child process endpoint for uts namespace	*/
 } mess_lc_mib_sysctl;
 _ASSERT_MSG_SIZE(mess_lc_mib_sysctl);
 

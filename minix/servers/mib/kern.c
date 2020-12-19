@@ -10,6 +10,7 @@
 #include "servers/vfs/dmap.h"
 
 static char hostname[MAXHOSTNAMELEN], domainname[MAXHOSTNAMELEN];
+static char hostname2[MAXUTSSPACES][MAXHOSTNAMELEN]={"0"};	/* hostname for uts */
 
 /*
  * Verification for CTL_KERN KERN_SECURELVL.
@@ -505,4 +506,12 @@ mib_kern_init(struct mib_node * node)
 {
 
 	MIB_INIT_ENODE(node, mib_kern_table);
+
+	for (size_t i = 0; i < MAXUTSSPACES; i++)
+	{
+		_proc_uts[i].endpoint_int =0;
+		_proc_uts[i].utsid =0;
+	}
+	
+
 }

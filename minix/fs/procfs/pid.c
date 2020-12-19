@@ -21,7 +21,7 @@ struct file pid_files[] = {
 	{ "cmdline",	REG_ALL_MODE,	(data_t) pid_cmdline	},
 	{ "environ",	REG_ALL_MODE,	(data_t) pid_environ	},
 	{ "map",	REG_ALL_MODE,	(data_t) pid_map	},
-	{ "mounts",	REG_ALL_MODE,	(data_t) pid_roots	},
+	{ "mounts",		REG_ALL_MODE,	(data_t) pid_roots	},
 	{ NULL,		0,		(data_t) NULL		}
 };
 

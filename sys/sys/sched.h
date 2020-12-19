@@ -195,6 +195,7 @@ struct schedstate_percpu {
 						   child */
 #define	CLONE_VFORK		0x00004000	/* parent blocks until child
 						   exits */
+#define CLONE_NEWUTS	0x04000000
 
 #endif /* _NETBSD_SOURCE */
 
