@@ -666,10 +666,10 @@ static void free_proc(int flags)
   if (fp->fp_wd) { put_vnode(fp->fp_wd); fp->fp_wd = NULL; }
 
   /* Release vmnt arrays in fproc table */
-  if (fp->new_mntns_flag == 1) {
+  /*if (fp->new_mntns_flag == 1) {
 	  free(fp->mnt_ns->vmnt_array_ptr);
 	  free(fp->mnt_ns);
-  }
+  }*/
 
   /* The rest of these actions is only done when processes actually exit. */
   if (!(flags & FP_EXITING)) return;

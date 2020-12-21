@@ -10,6 +10,7 @@ static void pid_cmdline(int slot);
 static void pid_environ(int slot);
 static void pid_map(int slot);
 static void pid_roots(int slot);
+int get_proc_data(pid_t pid, struct minix_proc_data * mpd);
 
 /*
  * The files that are dynamically created in each PID directory.  The data
