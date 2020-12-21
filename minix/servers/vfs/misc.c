@@ -620,6 +620,8 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
   /* Clone new ns */
   if (new_mntns_flag == 1) {
 	  clone_newns(parentno, childno);
+  } else {
+	  cp->mnt_ns = pp->mnt_ns;
   }
 
   /* Fill in new process and endpoint id. */
