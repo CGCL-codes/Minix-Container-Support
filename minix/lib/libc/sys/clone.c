@@ -5,6 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <sys/sched.h>
+#include <sys/sysctl.h>
+
 #ifdef __weak_alias
 __weak_alias(clone, _clone)
 #endif
@@ -17,7 +20,7 @@ int clone(int (*fn)(void *), void *stack, int flags, void *arg)
 
     m.m_lc_pm_clone.type = TYPE_CLONE;
     m.m_lc_pm_clone.clone_flags = flags;
-    m.m_lc_pm_clone.stack_addr = stack;
+    m.m_lc_pm_clone.stack_addr = (__uint32_t)stack;
 
     pid_t pid = _syscall(PM_PROC_NR, PM_FORK, &m);
     if(pid != 0) {
