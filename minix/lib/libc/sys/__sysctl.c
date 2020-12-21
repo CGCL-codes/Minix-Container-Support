@@ -3,6 +3,7 @@
 #include "namespace.h"
 #include "extern.h"
 #include <string.h>
+#include <unistd.h>
 
 /*
  * The sysctl(2) system call, handled by the MIB service.
