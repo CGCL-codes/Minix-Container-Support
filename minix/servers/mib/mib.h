@@ -33,6 +33,7 @@
 struct mib_oldp;
 struct mib_newp;
 
+#define MAXUTSSPACES 256 /* max counts of uts namespaces */ 
 struct proc_uts{
 	endpoint_t endpoint_int;	/* process endpoint */
 	unsigned int utsid;			/* namespace id */
