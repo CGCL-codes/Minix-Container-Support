@@ -191,10 +191,9 @@ struct schedstate_percpu {
 #define	CLONE_FILES		0x00000400	/* share file descriptors */
 #define	CLONE_SIGHAND		0x00000800	/* share signal actions */
 #define	CLONE_PID		0x00001000	/* share process ID */
-#define	CLONE_PTRACE		0x00002000	/* ptrace(2) continues on
-						   child */
-#define	CLONE_VFORK		0x00004000	/* parent blocks until child
-						   exits */
+#define	CLONE_PTRACE		0x00002000	/* ptrace(2) continues on child */
+#define	CLONE_VFORK		0x00004000	/* parent blocks until child exits */
+#define CLONE_NEWUTS	0x04000000	/* namespace for hostname and domainname */
 
 #endif /* _NETBSD_SOURCE */
 
