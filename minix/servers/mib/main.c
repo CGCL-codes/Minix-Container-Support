@@ -282,7 +282,7 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	size_t oldlen, newlen;
 	unsigned int namelen;
 	int s, name[CTL_MAXNAME];
-	endpoint_t endpt;
+	endpoint_t endpt,uts_pendpt,uts_cendpt;
 	struct mib_oldp oldp, *oldpp;
 	struct mib_newp newp, *newpp;
 	struct mib_call call;
@@ -298,6 +298,8 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	newaddr = m_in->m_lc_mib_sysctl.newp;
 	newlen = m_in->m_lc_mib_sysctl.newlen;
 	namelen = m_in->m_lc_mib_sysctl.namelen;
+	uts_pendpt = m_in->m_lc_mib_sysctl.uts_pendpt;
+	uts_cendpt = m_in->m_lc_mib_sysctl.uts_cendpt;
 
 	if (namelen == 0 || namelen > CTL_MAXNAME)
 		return EINVAL;
@@ -345,6 +347,8 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	 * all of them around as actual function parameters all the time.
 	 */
 	call.call_endpt = endpt;
+	call.call_utspendpt = uts_pendpt;
+	call.call_utscendpt = uts_cendpt;
 	call.call_name = name;
 	call.call_namelen = namelen;
 	call.call_flags = 0;
