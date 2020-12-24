@@ -10,6 +10,7 @@
 #include <minix/paths.h>
 #include <minix/rs.h>
 #include <minix/syslib.h>
+#include <minix/sysctl.h>
 #include <unistd.h>
 #define OK	0
 
@@ -27,7 +28,23 @@ static int rs_down(char *label)
 }
 
 char *find_rslabel(char *args_line);
-int get_proc_data(pid_t pid, struct minix_proc_data * mpd);
+
+/*
+ * Get MINIX3-specific process data for the process identified by the given
+ * kernel slot.  Return OK or a negative error code.
+ */
+int
+get_proc_data(pid_t pid, struct minix_proc_data * mpd)
+{
+	int mib[4] = { CTL_MINIX, MINIX_PROC, PROC_DATA, pid };
+	size_t oldlen;
+
+	oldlen = sizeof(*mpd);
+	if (__sysctl(mib, __arraycount(mib), mpd, &oldlen, NULL, 0) != 0)
+		return -errno;
+
+	return OK;
+}
 
 int minix_mount(char *special, char *name, int mountflags, int srvflags,
 	  char *type, char *args, pid_t pid)
@@ -45,7 +62,7 @@ int minix_mount(char *special, char *name, int mountflags, int srvflags,
   int use_existing = 0;
 
   if (get_proc_data(pid, &mpd) != OK)
-		return;
+		return -1;
 
   /* Default values. */
   if (type == NULL) type = __UNCONST(FSDEFAULT);
@@ -235,21 +252,4 @@ char *find_rslabel(char *args_line)
 	buf = strdup(buf); 
   free(input);
   return buf;
-}
-
-/*
- * Get MINIX3-specific process data for the process identified by the given
- * kernel slot.  Return OK or a negative error code.
- */
-int
-get_proc_data(pid_t pid, struct minix_proc_data * mpd)
-{
-	int mib[4] = { CTL_MINIX, MINIX_PROC, PROC_DATA, pid };
-	size_t oldlen;
-
-	oldlen = sizeof(*mpd);
-	if (__sysctl(mib, __arraycount(mib), mpd, &oldlen, NULL, 0) != 0)
-		return -errno;
-
-	return OK;
 }
