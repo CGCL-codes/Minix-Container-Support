@@ -27,13 +27,15 @@ static int rs_down(char *label)
 }
 
 char *find_rslabel(char *args_line);
+int get_proc_data(pid_t pid, struct minix_proc_data * mpd);
 
 int minix_mount(char *special, char *name, int mountflags, int srvflags,
-	  char *type, char *args)
+	  char *type, char *args, pid_t pid)
 {
   int r;
   message m;
   struct stat statbuf;
+  struct minix_proc_data mpd;
   char label[MNT_LABEL_LEN];
   char path[PATH_MAX];
   char cmd[200];
@@ -41,6 +43,9 @@ int minix_mount(char *special, char *name, int mountflags, int srvflags,
   char *rslabel;
   int reuse = 0;
   int use_existing = 0;
+
+  if (get_proc_data(pid, &mpd) != OK)
+		return;
 
   /* Default values. */
   if (type == NULL) type = __UNCONST(FSDEFAULT);
@@ -154,6 +159,7 @@ int minix_mount(char *special, char *name, int mountflags, int srvflags,
   m.m_lc_vfs_mount.path = (vir_bytes)name;
   m.m_lc_vfs_mount.type = (vir_bytes)type;
   m.m_lc_vfs_mount.label = (vir_bytes)label;
+  m.m_lc_vfs_mount.mnt_ep = mpd.mpd_endpoint;
   r = _syscall(VFS_PROC_NR, VFS_MOUNT, &m);
 
   if (r != OK && !use_existing) {
@@ -231,3 +237,19 @@ char *find_rslabel(char *args_line)
   return buf;
 }
 
+/*
+ * Get MINIX3-specific process data for the process identified by the given
+ * kernel slot.  Return OK or a negative error code.
+ */
+int
+get_proc_data(pid_t pid, struct minix_proc_data * mpd)
+{
+	int mib[4] = { CTL_MINIX, MINIX_PROC, PROC_DATA, pid };
+	size_t oldlen;
+
+	oldlen = sizeof(*mpd);
+	if (__sysctl(mib, __arraycount(mib), mpd, &oldlen, NULL, 0) != 0)
+		return -errno;
+
+	return OK;
+}

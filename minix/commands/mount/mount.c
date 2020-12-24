@@ -16,7 +16,7 @@ int main(int argc, char **argv);
 void list(void);
 void usage(void);
 void update_mtab(char *dev, char *mountpoint, char *fstype, int mountflags);
-int mount_all(void);
+int mount_all(pid_t pid);
 
 static int write_mtab = 1;
 
@@ -26,6 +26,7 @@ char *argv[];
 {
   int all = 0, i, v = 0, mountflags, srvflags;
   char **ap, *opt, *err, *type, *args, *device;
+  pid_t pid = getppid();
 
   if (argc == 1) list();	/* just list /etc/mtab */
   mountflags = 0;
@@ -59,7 +60,7 @@ char *argv[];
 
   if (!all && (argc != 3 || *argv[1] == 0)) usage();
   if (all == 1) {
-	return mount_all();
+	return mount_all(pid);
   }
 
   device = argv[1];
@@ -77,7 +78,7 @@ char *argv[];
 	}
   }
 
-  if (minix_mount(device, argv[2], mountflags, srvflags, type, args) < 0) {
+  if (minix_mount(device, argv[2], mountflags, srvflags, type, args, pid) < 0) {
 	err = strerror(errno);
 	fprintf(stderr, "mount: Can't mount %s on %s: %s\n",
 		argv[1], argv[2], err);
@@ -121,7 +122,7 @@ has_opt(char *mntopts, char *option)
 
 
 int
-mount_all()
+mount_all(pid_t pid)
 {
 	struct fstab *fs;
 	int ro, mountflags;
@@ -155,7 +156,7 @@ mount_all()
 			device = NULL;
 
 		if (minix_mount(device, mountpoint, mountflags, 0, fs->fs_vfstype,
-		    fs->fs_mntops) != 0) {
+		    fs->fs_mntops, pid) != 0) {
 			err = strerror(errno);
 			fprintf(stderr, "mount: Can't mount %s on %s: %s\n",
 				fs->fs_spec, fs->fs_file, err);

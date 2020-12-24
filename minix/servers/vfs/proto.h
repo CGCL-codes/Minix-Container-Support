@@ -146,7 +146,7 @@ int is_nonedev(dev_t dev);
 void mount_pfs(void);
 int mount_fs(dev_t dev, char mount_dev[PATH_MAX], char mount_path[PATH_MAX],
 	endpoint_t fs_e, int rdonly, char mount_type[FSTYPE_MAX],
-	char mount_label[LABEL_MAX]);
+	char mount_label[LABEL_MAX], endpoint_t mnt_e);
 int unmount(dev_t dev, char label[LABEL_MAX]);
 void unmount_all(int force);
 
@@ -365,6 +365,7 @@ void check_vmnt_locks(void);
 void check_vmnt_locks_by_me(struct fproc *rfp);
 void mark_vmnt_free(struct vmnt *vmp);
 struct vmnt *get_free_vmnt(void);
+struct vmnt *get_free_vmnt_in_fproc(struct vmnt *vmnt_tab);
 struct vmnt *find_vmnt(endpoint_t fs_e);
 struct vmnt *get_locked_vmnt(struct fproc *rfp);
 void init_vmnts(void);

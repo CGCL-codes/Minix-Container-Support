@@ -519,7 +519,7 @@ int	minix_umount(const char *_name, int srvflags);
 int mount(const char *, const char *, int, void *, size_t) __RENAME(__mount50);
 #else
 int minix_mount(char *_spec, char *_name, int _mountflags, int srvflags, char *type,
-	char *args);
+	char *args, pid_t pid);
 #endif /* !defined(__minix) */
 int	fhopen(const void *, size_t, int) __RENAME(__fhopen40);
 int	fhstat(const void *, size_t, struct stat *) __RENAME(__fhstat50);

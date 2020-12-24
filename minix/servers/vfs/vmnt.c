@@ -106,6 +106,20 @@ struct vmnt *get_free_vmnt(void)
   return(NULL);
 }
 
+struct vmnt *get_free_vmnt_in_fproc(struct vmnt *vmnt_tab)
+{
+  struct vmnt *vmp;
+
+  for (vmp = &vmnt_tab[0]; vmp < &vmnt_tab[NR_MNTS]; ++vmp) {
+	if (vmp->m_dev == NO_DEV) {
+		clear_vmnt(vmp);
+		return(vmp);
+	}
+  }
+
+  return(NULL);
+}
+
 /*===========================================================================*
  *                             find_vmnt				     *
  *===========================================================================*/

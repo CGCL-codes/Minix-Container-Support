@@ -85,7 +85,7 @@ static void update_bspec(dev_t dev, endpoint_t fs_e, int send_drv_e)
 int do_mount(void)
 {
 /* Perform the mount(name, mfile, mount_flags) system call. */
-  endpoint_t fs_e;
+  endpoint_t fs_e, mnt_e;
   int r, slot, nodev;
   char mount_path[PATH_MAX], mount_dev[PATH_MAX];
   char mount_label[LABEL_MAX], mount_type[FSTYPE_MAX];
@@ -103,6 +103,7 @@ int do_mount(void)
   vname2_length = job_m_in.m_lc_vfs_mount.pathlen;
   type = job_m_in.m_lc_vfs_mount.type;
   type_len = job_m_in.m_lc_vfs_mount.typelen;
+  mnt_e = job_m_in.m_lc_vfs_mount.mnt_ep;
 
   /* Only the super-user may do MOUNT. */
   if (!super_user) return(EPERM);
@@ -146,7 +147,7 @@ int do_mount(void)
 
   /* Do the actual job */
   return mount_fs(dev, mount_dev, mount_path, fs_e, mflags, mount_type,
-	mount_label);
+	mount_label, mnt_e);
 }
 
 
@@ -160,13 +161,14 @@ char mount_path[PATH_MAX],
 endpoint_t fs_e,
 int flags,
 char mount_type[FSTYPE_MAX],
-char mount_label[LABEL_MAX] )
+char mount_label[LABEL_MAX],
+endpoint_t mnt_e )
 {
   int i, r = OK, found, isroot, mount_root, slot;
-  struct fproc *tfp, *rfp;
+  struct fproc *tfp, *rfp, *vmntfp;
   struct dmap *dp;
   struct vnode *root_node, *vp = NULL;
-  struct vmnt *new_vmp, *parent_vmp;
+  struct vmnt *new_vmp, *parent_vmp, *vmnt_tab;
   char *label;
   struct node_details res;
   struct lookup resolve;
@@ -186,15 +188,17 @@ char mount_label[LABEL_MAX] )
 	label = dp->dmap_label;
 	assert(strlen(label) > 0);
   }
+  vmntfp = fproc_addr(mnt_e);
+  vmnt_tab = vmntfp->mnt_ns->vmnt_array_ptr;
 
   /* Scan vmnt table to see if dev already mounted. If not, find a free slot.*/
   found = FALSE;
   for (i = 0; i < NR_MNTS; ++i) {
-	if (vmnt[i].m_dev == dev) found = TRUE;
+	if (vmnt_tab[i].m_dev == dev) found = TRUE;
   }
   if (found) {
 	return(EBUSY);
-  } else if ((new_vmp = get_free_vmnt()) == NULL) {
+  } else if ((new_vmp = get_free_vmnt_in_fproc(vmnt_tab)) == NULL) {
 	return(ENOMEM);
   }
   if ((r = lock_vmnt(new_vmp, VMNT_EXCL)) != OK) return(r);
