@@ -40,6 +40,8 @@ EXTERN char mount_label[LABEL_MAX];	/* label of file system to mount */
 /* The following variables are used for returning results to the caller. */
 EXTERN int err_code;		/* temporary storage for error number */
 
+EXTERN struct vmnt *vmnt_in_proc;
+
 /* Data initialized elsewhere. */
 extern int (* const call_vec[])(void);
 

@@ -136,7 +136,7 @@ int fs_sendrec(endpoint_t fs_e, message *reqmp)
   struct vmnt *vmp;
   int r;
 
-  if ((vmp = find_vmnt(fs_e)) == NULL) {
+  if ((vmp = find_vmnt_in_fproc(fs_e)) == NULL) {
 	printf("Trying to talk to non-existent FS endpoint %d\n", fs_e);
 	return(EIO);
   }

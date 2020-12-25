@@ -190,6 +190,7 @@ endpoint_t mnt_e )
   }
   vmntfp = fproc_addr(mnt_e);
   vmnt_tab = vmntfp->mnt_ns->vmnt_array_ptr;
+  vmnt_in_proc = vmnt_tab;
 
   /* Scan vmnt table to see if dev already mounted. If not, find a free slot.*/
   found = FALSE;

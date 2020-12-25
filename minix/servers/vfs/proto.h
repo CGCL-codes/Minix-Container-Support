@@ -367,6 +367,7 @@ void mark_vmnt_free(struct vmnt *vmp);
 struct vmnt *get_free_vmnt(void);
 struct vmnt *get_free_vmnt_in_fproc(struct vmnt *vmnt_tab);
 struct vmnt *find_vmnt(endpoint_t fs_e);
+struct vmnt *find_vmnt_in_fproc(endpoint_t fs_e);
 struct vmnt *get_locked_vmnt(struct fproc *rfp);
 void init_vmnts(void);
 int lock_vmnt(struct vmnt *vp, tll_access_t locktype);

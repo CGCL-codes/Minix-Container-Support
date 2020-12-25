@@ -518,7 +518,7 @@ static void do_init_root(void)
   mount_label = "fs_imgrd"; /* FIXME: obtain this from RS */
 
   r = mount_fs(DEV_IMGRD, "bootramdisk", "/", MFS_PROC_NR, 0, mount_type,
-	mount_label);
+	mount_label, MFS_PROC_NR);
   if (r != OK)
 	panic("Failed to initialize root");
 

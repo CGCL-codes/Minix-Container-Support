@@ -64,7 +64,7 @@ check_vmnt_locks(void)
  *===========================================================================*/
 void mark_vmnt_free(struct vmnt *vmp)
 {
-  ASSERTVMP(vmp);
+  //ASSERTVMP(vmp);
 
   vmp->m_fs_e = NONE;
   vmp->m_dev = NO_DEV;
@@ -76,7 +76,7 @@ void mark_vmnt_free(struct vmnt *vmp)
 static void clear_vmnt(struct vmnt *vmp)
 {
 /* Reset vmp to initial parameters */
-  ASSERTVMP(vmp);
+  //ASSERTVMP(vmp);
 
   vmp->m_fs_e = NONE;
   vmp->m_dev = NO_DEV;
@@ -135,6 +135,18 @@ struct vmnt *find_vmnt(endpoint_t fs_e)
   return(NULL);
 }
 
+struct vmnt *find_vmnt_in_fproc(endpoint_t fs_e)
+{
+/* Find the vmnt belonging to an FS with endpoint 'fs_e' iff it's in use */
+  struct vmnt *vp;
+
+  for (vp = &vmnt_in_proc[0]; vp < &vmnt_in_proc[NR_MNTS]; ++vp)
+	if (vp->m_fs_e == fs_e && vp->m_dev != NO_DEV)
+		return(vp);
+
+  return(NULL);
+}
+
 /*===========================================================================*
  *                             init_vmnts				     *
  *===========================================================================*/
@@ -154,7 +166,7 @@ void init_vmnts(void)
  *===========================================================================*/
 static int is_vmnt_locked(struct vmnt *vmp)
 {
-  ASSERTVMP(vmp);
+  //ASSERTVMP(vmp);
   return(tll_islocked(&vmp->m_lock) || tll_haspendinglock(&vmp->m_lock));
 }
 
@@ -166,7 +178,7 @@ int lock_vmnt(struct vmnt *vmp, tll_access_t locktype)
   int r;
   tll_access_t initial_locktype;
 
-  ASSERTVMP(vmp);
+  //ASSERTVMP(vmp);
 
   initial_locktype = (locktype == VMNT_EXCL) ? VMNT_WRITE : locktype;
 
@@ -212,7 +224,7 @@ void vmnt_unmap_by_endpt(endpoint_t proc_e)
  *===========================================================================*/
 void unlock_vmnt(struct vmnt *vmp)
 {
-  ASSERTVMP(vmp);
+  //ASSERTVMP(vmp);
 
 #if LOCK_DEBUG
   /* Decrease read-only lock counter when not locked as VMNT_WRITE or
@@ -234,7 +246,7 @@ void unlock_vmnt(struct vmnt *vmp)
  *===========================================================================*/
 void downgrade_vmnt_lock(struct vmnt *vmp)
 {
-  ASSERTVMP(vmp);
+  //ASSERTVMP(vmp);
   tll_downgrade(&vmp->m_lock);
 
 #if LOCK_DEBUG
@@ -250,7 +262,7 @@ void downgrade_vmnt_lock(struct vmnt *vmp)
  *===========================================================================*/
 void upgrade_vmnt_lock(struct vmnt *vmp)
 {
-  ASSERTVMP(vmp);
+  //ASSERTVMP(vmp);
   tll_upgrade(&vmp->m_lock);
 }
 
