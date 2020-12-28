@@ -421,6 +421,7 @@ void mount_pfs(void)
   strlcpy(vmp->m_mount_path, "pipe", PATH_MAX);
   strlcpy(vmp->m_mount_dev, "none", PATH_MAX);
 
+  vmnt_in_proc = vmnt;
   /* Ask PFS to acknowledge being mounted. Ignore the returned node details. */
   r = req_readsuper(vmp, "", dev, FALSE, FALSE, &res, &fs_flags);
   if (r != OK)
