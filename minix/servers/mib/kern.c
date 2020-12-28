@@ -33,7 +33,7 @@ int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
 	int i = 1;	
 	while (utsspace[i] != 0 && i < MAXUTSSPACES)  i++;	/* search for the first free item */
 
-	if (_proc_uts[p_endpt].utsid == 0) {		/* case for parent precess in zero uts namespace */
+	if (_proc_uts[p_endpt].utsid == 0) {		/* case for parent process in zero uts namespace */
 		int j = 0;
 		while (hostname[j] != '\0')
 		{
@@ -58,7 +58,7 @@ int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
 }
 
 /* get process utsid */
-int mib_geiutsid(endpoint_t endpt) {
+int mib_getutsid(endpoint_t endpt) {
 	for (int i = 1; i < MAXUTSSPACES; i++) {
 		if (_proc_uts[i].endpt == endpt) {
 			return _proc_uts[i].utsid;
