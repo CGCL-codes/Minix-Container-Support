@@ -10,7 +10,64 @@
 #include "servers/vfs/dmap.h"
 
 static char hostname[MAXHOSTNAMELEN], domainname[MAXHOSTNAMELEN];
-static char hostname_uts[MAXUTSSPACES][MAXHOSTNAMELEN];
+
+/* if a new uts namespace is created. add a new item in _proc_uts table 
+	to map the new process endpoint with a free uts index, return the new namespace id */ 
+int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
+	int maxUTSid = 0;
+	int emptyindex = 0;
+	int utsspace[MAXUTSSPACES] = { 0 };	
+
+	for (int i = 1; i < MAXUTSSPACES; i++) {
+		if (emptyindex != 0) {					
+			if(_proc_uts[i].utsid!=0) utsspace[_proc_uts[i].utsid]++;
+			if (_proc_uts[i].endpt == c_endpt) {		/* to ensure every process in only one uts space */
+				return 0;
+			}
+		}
+		else if (_proc_uts[i].endpt == 0 && _proc_uts[i].utsid == 0) {
+				emptyindex = i;
+		}
+	}
+
+	int i = 1;	
+	while (utsspace[i] != 0 && i < MAXUTSSPACES)  i++;	/* search for the first free item */
+
+	if (_proc_uts[p_endpt].utsid == 0) {		/* case for parent precess in zero uts namespace */
+		int j = 0;
+		while (hostname[j] != '\0')
+		{
+			hostname_uts[i][j] = hostname[j];
+			j++;
+		}
+		hostname_uts[i][j] = hostname[j];
+	}
+	else {
+		int j = 0;
+		while (hostname_uts[p_endpt][j] != '\0')
+		{
+			hostname_uts[i][j] = hostname_uts[p_endpt][j];
+			j++;
+		}
+		hostname_uts[i][j] = hostname_uts[p_endpt][j];
+	}
+	_proc_uts[emptyindex].endpt = c_endpt;
+	_proc_uts[emptyindex].utsid = i;
+
+	return i;
+}
+
+/* get process utsid */
+int mib_geiutsid(endpoint_t endpt) {
+	for (int i = 1; i < MAXUTSSPACES; i++) {
+		if (_proc_uts[i].endpt == endpt) {
+			return _proc_uts[i].utsid;
+		}
+	}
+	// default in space zero 
+	return 0;
+}
+
 
 /*
  * Verification for CTL_KERN KERN_SECURELVL.
@@ -510,7 +567,7 @@ mib_kern_init(struct mib_node * node)
 	// initialize process and uts map table
 	for (size_t i = 0; i < MAXUTSSPACES; i++)
 	{
-		_proc_uts[i].endpoint_int = 0;
+		_proc_uts[i].endpt = 0;
 		_proc_uts[i].utsid = 0;		
 	}
 	

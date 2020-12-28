@@ -34,8 +34,9 @@ struct mib_oldp;
 struct mib_newp;
 
 #define MAXUTSSPACES 256
+char hostname_uts[MAXUTSSPACES][MAXHOSTNAMELEN];
 struct proc_uts{
-	endpoint_t endpoint_int;	/* process endpoint */
+	endpoint_t endpt;	/* process endpoint */
 	unsigned int utsid;			/* namespace id */
 }_proc_uts[NR_PROCS];
 
@@ -372,6 +373,10 @@ void mib_unmount(struct mib_node *);
 extern unsigned int mib_nodes;
 extern unsigned int mib_objects;
 extern unsigned int mib_remotes;
+
+/* kern.c */
+int mib_geiutsid(endpoint_t endpt);
+int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt);
 
 /* remote.c */
 void mib_remote_init(void);

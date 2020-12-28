@@ -1112,8 +1112,8 @@ mib_getptr(struct mib_node * node)
 			return &node->node_quad;
 		break;
 	case CTLTYPE_STRING:
-		if (node->node_name == "hostname" && node->utsid != 0) {
-				return hostname_uts[node->utsid];	// 新增，对于主机名称要找到对应的局部主机名
+		if (node->node_name != NULL && strcmp(node->node_name ,"hostname") == 0 && node->utsid != 0) {
+				return hostname_uts[node->utsid];	/* find local hostname in a certain uts */
 		}
 	case CTLTYPE_STRUCT:
 		if (node->node_flags & CTLFLAG_IMMEDIATE)
@@ -1124,55 +1124,6 @@ mib_getptr(struct mib_node * node)
 	}
 
 	return node->node_data;
-}
-
-// 新增：clone创建新的命名空间，向procuts二维表中写入信息，返回新的名称空间id
-int createnewuts(int pid, int c_endpoint) {
-	int maxUTSid = 0;
-	int emptyindex = 0;
-	int utsspace[MAXUTSSPACES] = { 0 };	// 解决空闲断裂的问题
-	// 设置增长上限，降低遍历次数
-	// 是否可全局化？
-
-	for (int i = 1; i < MAXUTSSPACES; i++) {
-		if (emptyindex != 0) {					// 初始空闲状态
-			if(_proc_uts[i].utsid!=0) utsspace[_proc_uts[i].utsid]++;
-			if (_proc_uts[i].p_endpoint == c_endpoint) {	// 每个进程端点对应唯一的主机名称空间号
-				return 0;
-			}
-		}
-		else if (_proc_uts[i].p_endpoint == 0 && _proc_uts[i].utsid == 0) {
-				emptyindex = i;
-		}
-	}
-
-	// 返回空间不够异常
-
-	int i = 1;	// 寻找空闲索引，可利用中间断裂的序号
-	while (utsspace[i] != 0 && i < MAXUTSSPACES)  i++;
-
-	if (_proc_uts[pid].utsid == 0) {		// 父进程在默认名称空间
-		int j = 0;
-		while (hostname[j] != '\0')
-		{
-			hostname_uts[i][j] = hostname[j];
-			j++;
-		}
-		hostname_uts[i][j] = hostname[j];
-	}
-	else {
-		int j = 0;
-		while (hostname_uts[pid][j] != '\0')
-		{
-			hostname_uts[i][j] = hostname_uts[pid][j];
-			j++;
-		}
-		hostname_uts[i][j] = hostname_uts[pid][j];
-	}
-	_proc_uts[emptyindex].p_endpoint = c_endpoint;
-	_proc_uts[emptyindex].utsid = i;
-
-	return i;
 }
 
 /*
@@ -1360,17 +1311,6 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	return r;
 }
 
-/* get process utsid */
-int uts_getid(int p_endpoint) {
-	for (int i = 1; i < MAXUTSSPACES; i++) {
-		if (_proc_uts[i].p_endpoint == p_endpoint) {
-			return _proc_uts[i].utsid;
-		}
-	}
-	// default in space zero 
-	return 0;
-}
-
 /*
  * Read and/or write the value of a regular data node.  A regular data node is
  * a leaf node.  Typically, a leaf node has no associated function, in which
@@ -1384,8 +1324,8 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	ssize_t len;
 	int r;
 	
-	if (node->node_name == "hostname") {	// 判断节点，需要验证
-		node->utsid = uts_getid(call->call_utspendpt);	// 新增：通过父进程id查找父命名空间id号
+	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {		/* for node 'hostname' ,find uts id for parent process*/
+		node->utsid = uts_getid(call->call_utspendpt);	
 	}
 
 	/* Copy out old data, if requested.  Always get the old data length. */
