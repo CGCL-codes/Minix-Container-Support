@@ -1171,7 +1171,7 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	if (call->call_utscendpt != 0) {		/* clone a new space*/
 
 		int cid = 0;
-		if ((cid = createnewuts(node->utsid, call->call_utscendpt)) == 0) {
+		if ((cid = mib_createnewuts(node->utsid, call->call_utscendpt)) == 0) {
 			return EEXIST;
 		}
 		return OK;
@@ -1325,7 +1325,7 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	int r;
 	
 	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {		/* for node 'hostname' ,find uts id for parent process*/
-		node->utsid = uts_getid(call->call_utspendpt);	
+		node->utsid = mib_getutsid(call->call_utspendpt);	
 	}
 
 	/* Copy out old data, if requested.  Always get the old data length. */
