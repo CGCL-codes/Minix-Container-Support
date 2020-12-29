@@ -375,7 +375,7 @@ extern unsigned int mib_objects;
 extern unsigned int mib_remotes;
 
 /* kern.c */
-int mib_geiutsid(endpoint_t endpt);
+int mib_getutsid(endpoint_t endpt);
 int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt);
 
 /* remote.c */
