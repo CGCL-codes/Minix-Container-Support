@@ -14,7 +14,6 @@ static char hostname[MAXHOSTNAMELEN], domainname[MAXHOSTNAMELEN];
 /* if a new uts namespace is created. add a new item in _proc_uts table 
 	to map the new process endpoint with a free uts index, return the new namespace id */ 
 int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
-	int maxUTSid = 0;
 	int emptyindex = 0;
 	int utsspace[MAXUTSSPACES] = { 0 };	
 
