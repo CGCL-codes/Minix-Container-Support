@@ -349,6 +349,7 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	call.call_endpt = endpt;
 	call.call_utspendpt = uts_pendpt;
 	call.call_utscendpt = uts_cendpt;
+	printf("main.c mib_sysctl: call_utspendpt is %d and call_utscendpt is %d \n ", call.call_utspendpt, call.call_utscendpt);
 	call.call_name = name;
 	call.call_namelen = namelen;
 	call.call_flags = 0;

@@ -1112,7 +1112,9 @@ mib_getptr(struct mib_node * node)
 			return &node->node_quad;
 		break;
 	case CTLTYPE_STRING:
+		printf("tree.c mib_getptr STRING before \n");
 		if (node->node_name != NULL && strcmp(node->node_name ,"hostname") == 0 && node->utsid != 0) {
+				printf("tree.c mib_getptr STRING node->utsid is: %d \n" + node->utsid);
 				return hostname_uts[node->utsid];	/* find local hostname in a certain uts */
 		}
 	case CTLTYPE_STRUCT:
@@ -1168,14 +1170,17 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	size_t newlen;
 	int r;
 	
+	printf("tree.c mib_write before \n");
 	if (call->call_utscendpt != 0) {		/* clone a new space*/
 
 		int cid = 0;
 		if ((cid = mib_createnewuts(node->utsid, call->call_utscendpt)) == 0) {
 			return EEXIST;
 		}
+		printf("tree.c mib_write cid is %d" + cid);
 		return OK;
 	}
+	printf("tree.c mib_write after \n");
 
 	if (newp == NULL)
 		return OK; /* nothing to do */
@@ -1297,6 +1302,7 @@ mib_write(struct mib_call * call, struct mib_node * node,
 			 */
 			src[newlen] = '\0';
 			strlcpy(dst, src, node->node_size);
+			printf("tree.c mib_write dst is %s \n", dst);
 			break;
 		default:
 			r = EINVAL;
@@ -1324,8 +1330,10 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	ssize_t len;
 	int r;
 	
+	printf("tree.c mib_readwrite before \n");
 	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {		/* for node 'hostname' ,find uts id for parent process*/
 		node->utsid = mib_getutsid(call->call_utspendpt);	
+		printf("tree.c mib_readwrite node->utsid is %d \n" + node->utsid);
 	}
 
 	/* Copy out old data, if requested.  Always get the old data length. */

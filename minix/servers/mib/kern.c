@@ -53,6 +53,11 @@ int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
 	_proc_uts[emptyindex].endpt = c_endpt;
 	_proc_uts[emptyindex].utsid = i;
 
+	for (size_t i = 0; i < 20; i++)
+	{
+		printf("kern.c mib_createnewuts : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
+	}
+	
 	return i;
 }
 
