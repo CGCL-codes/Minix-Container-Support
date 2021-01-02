@@ -1112,7 +1112,7 @@ mib_getptr(struct mib_node * node)
 			return &node->node_quad;
 		break;
 	case CTLTYPE_STRING:
-		printf("tree.c mib_getptr STRING before \n");
+		// printf("tree.c mib_getptr STRING before \n");
 		if (node->node_name != NULL && strcmp(node->node_name ,"hostname") == 0 && node->utsid != 0) {
 				printf("tree.c mib_getptr STRING node->utsid is: %d \n" , node->utsid);
 				return hostname_uts[node->utsid];	/* find local hostname in a certain uts */
@@ -1170,7 +1170,7 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	size_t newlen;
 	int r;
 	
-	printf("tree.c mib_write before \n");
+	// printf("tree.c mib_write before \n");
 	if (call->call_utscendpt != 0) {		/* clone a new space*/
 
 		int cid = 0;
@@ -1180,7 +1180,7 @@ mib_write(struct mib_call * call, struct mib_node * node,
 		printf("tree.c mib_write cid is %d \n" , cid);
 		return OK;
 	}
-	printf("tree.c mib_write after \n");
+	// printf("tree.c mib_write after \n");
 
 	if (newp == NULL)
 		return OK; /* nothing to do */
@@ -1330,7 +1330,7 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	ssize_t len;
 	int r;
 	
-	printf("tree.c mib_readwrite before \n");
+	// printf("tree.c mib_readwrite before \n");
 	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {		/* for node 'hostname' ,find uts id for parent process*/
 		node->utsid = mib_getutsid(call->call_utspendpt);	
 		printf("tree.c mib_readwrite node->utsid is %d \n" , node->utsid);
@@ -1343,11 +1343,13 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	/* Copy in new data, if requested. */
 	if ((r = mib_write(call, node, newp, verify)) != OK)
 		return r;
-
-	for (size_t i = 0; i < 20; i++)
+	
+	/* 
+	for (size_t i = 0; i < 5; i++)
 	{
 		printf("tree.c mib_readwrite : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
 	}
+	*/
 
 	/* Return the old data length. */
 	return len;
