@@ -15,25 +15,27 @@ static char hostname[MAXHOSTNAMELEN], domainname[MAXHOSTNAMELEN];
 	add a new item in _proc_uts table to map the new process endpoint with a free uts index, 
 	return the new namespace id */ 
 int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
-	int emptyindex = 0;
+	int emptyindex = -1;
 	int utsspace[MAXUTSSPACES] = { 0 };	
 
+	/* search for _proc_uts for a free item */
 	for (int i = 0; i < NR_PROCS; i++) {
-		if (emptyindex != 0) {					
-			if(_proc_uts[i].utsid != 0) utsspace[_proc_uts[i].utsid]++;
-			if (_proc_uts[i].endpt == c_endpt) {		/* to ensure every process in only one uts space */
-				return 0;
-			}
-		}
-		else if (_proc_uts[i].endpt == 0 && _proc_uts[i].utsid == 0) {
+				
+		if(_proc_uts[i].utsid != 0) utsspace[_proc_uts[i].utsid]++;
+		// if (_proc_uts[i].endpt == c_endpt) {		/* to ensure every process in only one uts space */
+		//	return EEXIST;
+		// }
+
+		if (emptyindex == -1 && _proc_uts[i].endpt == 0 && _proc_uts[i].utsid == 0) {
 				emptyindex = i;
 				_proc_uts[emptyindex].endpt = c_endpt;
-				_proc_uts[emptyindex].utsid = i;
 		}
 	}
 
+	/* search for utsspace for a free index */
 	int ifree = 1;	
 	while (utsspace[ifree] != 0 && ifree < MAXUTSSPACES)  ifree++;	/* search for the first free item */
+	_proc_uts[emptyindex].utsid = ifree;
 
 	if (_proc_uts[p_endpt].utsid == 0) {		/* case for parent process in zero uts namespace */
 		int j = 0;
@@ -61,7 +63,7 @@ int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
 		printf("kern.c mib_createnewuts : _proc_uts[%d] , endpt is: %d , utsid is %d \n" , k , _proc_uts[emptyindex].endpt, _proc_uts[emptyindex].utsid);
 	}
 	
-	return i;
+	return ifree;
 }
 
 /* get process utsid */
