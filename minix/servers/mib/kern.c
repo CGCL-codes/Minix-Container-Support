@@ -10,34 +10,27 @@
 #include "servers/vfs/dmap.h"
 
 static char hostname[MAXHOSTNAMELEN], domainname[MAXHOSTNAMELEN];
+static int utsspace[MAXUTSSPACES] = { 0 };
+
+static int mib_getfreeprocutsid();
 
 /* if a new uts namespace is created,
 	add a new item in _proc_uts table to map the new process endpoint with a free uts index, 
 	return the new namespace id */ 
 int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
-	int emptyindex = -1;
-	int utsspace[MAXUTSSPACES] = { 0 };	
+	int f_puid = mib_getfreeprocutsid();
+	if (f_puid == -1) return ENOMEM;
 
-	/* search for _proc_uts for a free item */
-	for (int i = 0; i < NR_PROCS; i++) {
-				
-		if(_proc_uts[i].utsid != 0) utsspace[_proc_uts[i].utsid]++;
-		// if (_proc_uts[i].endpt == c_endpt) {		/* to ensure every process in only one uts space */
-		//	return EEXIST;
-		// }
-
-		if (emptyindex == -1 && _proc_uts[i].endpt == 0 && _proc_uts[i].utsid == 0) {
-				emptyindex = i;
-				_proc_uts[emptyindex].endpt = c_endpt;
-		}
-	}
-
+	_proc_uts[f_puid].endpt = c_endpt;
 	/* search for utsspace for a free index */
-	int ifree = 1;	
+	int ifree = 1;
 	while (utsspace[ifree] != 0 && ifree < MAXUTSSPACES)  ifree++;	/* search for the first free item */
-	_proc_uts[emptyindex].utsid = ifree;
+	_proc_uts[f_puid].utsid = ifree;
 
-	if (_proc_uts[p_endpt].utsid == 0) {		/* case for parent process in zero uts namespace */
+	int p_utsid = mib_getutsid(p_endpt);
+	/* set new hostname */
+	if (p_utsid == 0) {		/* case for parent process in zero uts namespace */
+		printf("parent in space zero \n");
 		int j = 0;
 		while (hostname[j] != '\0')
 		{
@@ -47,34 +40,46 @@ int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
 		hostname_uts[ifree][j] = hostname[j];
 	}
 	else {
+		printf("parent in other space \n");
 		int j = 0;
-		while (hostname_uts[p_endpt][j] != '\0')
+		while (hostname_uts[p_utsid][j] != '\0')
 		{
-			hostname_uts[ifree][j] = hostname_uts[p_endpt][j];
+			hostname_uts[ifree][j] = hostname_uts[p_utsid][j];
 			j++;
 		}
-		hostname_uts[ifree][j] = hostname_uts[p_endpt][j];
+		hostname_uts[ifree][j] = hostname_uts[p_utsid][j];
 	}
 
+	utsspace[ifree]++;
 
+	printf("kern.c mib_createnewuts hostname is %s \n", hostname);
 	for (int k = 0; k < 5; k++)
 	{
-		printf("kern.c mib_createnewuts : hostname_uts[%d] is: %s \n" , k , hostname_uts[k]);
-		printf("kern.c mib_createnewuts : _proc_uts[%d] , endpt is: %d , utsid is %d \n" , k , _proc_uts[emptyindex].endpt, _proc_uts[emptyindex].utsid);
+		printf("kern.c mib_createnewuts : hostname_uts[%d] is: %s \n", k, hostname_uts[k]);
+		printf("kern.c mib_createnewuts : _proc_uts[%d] , endpt is: %d , utsid is %d \n", k, _proc_uts[k].endpt, _proc_uts[k].utsid);
 	}
-	
+
 	return ifree;
 }
 
 /* get process utsid */
 int mib_getutsid(endpoint_t endpt) {
-	for (int i = 1; i < MAXUTSSPACES; i++) {
+	for (int i = 0; i < NR_PROCS; i++) {
 		if (_proc_uts[i].endpt == endpt) {
 			return _proc_uts[i].utsid;
 		}
 	}
 	// default in space zero 
 	return 0;
+}
+
+int mib_getfreeprocutsid() {
+	for (int i = 0; i < NR_PROCS; i++) {
+		if ( _proc_uts[i].endpt == 0 && _proc_uts[i].utsid == 0) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 

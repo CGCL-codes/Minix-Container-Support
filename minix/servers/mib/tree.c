@@ -1174,8 +1174,8 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	if (call->call_utscendpt != 0) {		/* clone a new space*/
 
 		int cid = 0;
-		if ((cid = mib_createnewuts(node->utsid, call->call_utscendpt)) == 0) {
-			return EEXIST;
+		if ((cid = mib_createnewuts(node->utsid, call->call_utscendpt)) == ENOMEM) {
+			return ENOMEM;
 		}
 		printf("tree.c mib_write cid is %d \n" , cid);
 		return OK;
