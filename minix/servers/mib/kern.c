@@ -17,7 +17,7 @@ static int mib_getfreeprocutsid();
 /* if a new uts namespace is created,
 	add a new item in _proc_uts table to map the new process endpoint with a free uts index, 
 	return the new namespace id */ 
-int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
+int mib_createnewuts(int p_utsid, endpoint_t c_endpt) {
 	int f_puid = mib_getfreeprocutsid();
 	if (f_puid == -1) return ENOMEM;
 
@@ -27,7 +27,6 @@ int mib_createnewuts(endpoint_t p_endpt, endpoint_t c_endpt) {
 	while (utsspace[ifree] != 0 && ifree < MAXUTSSPACES)  ifree++;	/* search for the first free item */
 	_proc_uts[f_puid].utsid = ifree;
 
-	int p_utsid = mib_getutsid(p_endpt);
 	/* set new hostname */
 	if (p_utsid == 0) {		/* case for parent process in zero uts namespace */
 		printf("parent in space zero \n");

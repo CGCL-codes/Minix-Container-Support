@@ -1260,6 +1260,7 @@ mib_write(struct mib_call * call, struct mib_node * node,
 
 	/* Copy in the data.  Note that newlen may be zero. */
 	r = mib_copyin(newp, src, newlen);
+	// printf("tree.c write src: %s , newlen: %d \n", src, newlen);
 
 	if (r == OK && verify != NULL && !verify(call, node, src, newlen))
 		r = EINVAL;
@@ -1344,12 +1345,13 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	if ((r = mib_write(call, node, newp, verify)) != OK)
 		return r;
 	
-	/* 
-	for (size_t i = 0; i < 5; i++)
-	{
-		printf("tree.c mib_readwrite : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
+	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {	
+		for (size_t i = 0; i < 5; i++)
+		{
+			printf("tree.c mib_readwrite : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
+		}
 	}
-	*/
+
 
 	/* Return the old data length. */
 	return len;
