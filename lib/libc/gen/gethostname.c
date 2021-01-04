@@ -46,11 +46,16 @@ __RCSID("$NetBSD: gethostname.c,v 1.13 2012/06/25 22:32:43 abs Exp $");
 #include <errno.h>
 #include <unistd.h>
 
+#include <lib.h>
+#include <string.h>
+#include <stdio.h>
+
+
 #ifdef __weak_alias
 __weak_alias(gethostname,_gethostname)
 #endif
 
-int mysysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen);
+int sysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen);
 
 int
 gethostname(char *name, size_t namelen)
@@ -63,13 +68,13 @@ gethostname(char *name, size_t namelen)
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_HOSTNAME;
 	size = namelen;
-	if (sysctl(mib, 2, name, &size, NULL, 0) == -1)
+	if (sysctl_uts(name, &size, NULL, 0) == -1)
 		return (-1);
 
 	return (0);
 }
 
-int mysysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen)
+int sysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen)
 {
 	message m;
 	int r;

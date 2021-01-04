@@ -46,11 +46,15 @@ __RCSID("$NetBSD: sethostname.c,v 1.13 2012/06/25 22:32:43 abs Exp $");
 #include <errno.h>
 #include <unistd.h>
 
+#include <lib.h>
+#include <string.h>
+#include <stdio.h>
+
 #ifdef __weak_alias
 __weak_alias(sethostname,_sethostname)
 #endif
 
-int mysysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen);
+int sysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen);
 
 int
 sethostname(const char *name, size_t namelen)
@@ -61,7 +65,7 @@ sethostname(const char *name, size_t namelen)
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_HOSTNAME;
-	if (sysctl(mib, 2, NULL, NULL, name, namelen) == -1)
+	if (sysctl_uts(NULL, NULL, name, namelen) == -1)
 		return (-1);
 	return (0);
 }

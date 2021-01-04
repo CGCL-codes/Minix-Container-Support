@@ -1,9 +1,14 @@
 #include <sys/cdefs.h>
 #include "namespace.h"
 #include <lib.h>
+#include <sys/sched.h>
+#include <signal.h>
 
 #include <string.h>
 #include <unistd.h>
+
+#include <sys/sysctl.h>
+#include <stdio.h>
 
 #ifdef __weak_alias
 __weak_alias(clone, _clone)
