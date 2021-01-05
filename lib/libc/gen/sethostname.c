@@ -88,16 +88,11 @@ int mysysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen
 	m.m_lc_mib_sysctl.namelen = 2;
 	memcpy(m.m_lc_mib_sysctl.name, mib, sizeof(*mib) * 2);
 	
-	m.m_lc_mib_sysctl.uts_pendpt = getppid();     // 父进程此处获取父进程，子进程此处应获取祖父进程
-	printf("get and set grandfather process ID:%d\n", m.m_lc_mib_sysctl.uts_pendpt);
+	m.m_lc_mib_sysctl.uts_pendpt = getppid(); 
 	m.m_lc_mib_sysctl.uts_cendpt = 0;	
-	printf("get and set child process ID:%d\n", m.m_lc_mib_sysctl.uts_cendpt);
-	
-	// printf("%lu %d %lu %d %d %lu %d %d\n",m.m_lc_mib_sysctl.oldp,m.m_lc_mib_sysctl.oldlen,m.m_lc_mib_sysctl.newp,m.m_lc_mib_sysctl.newlen, m.m_lc_mib_sysctl.namelen ,m.m_lc_mib_sysctl.namep, m.m_lc_mib_sysctl.uts_pendpt, m.m_lc_mib_sysctl.uts_cendpt );
 
-	r = _syscall(MIB_PROC_NR, MIB_SYSCTL, &m);	// 测试：MIB系统调用可行
-	// printf("r is:%d\n", r);
-	
+	r = _syscall(MIB_PROC_NR, MIB_SYSCTL, &m);
+
 	/*
 	 * We copy the NetBSD behavior of replying with the old length also if
 	 * the call failed, typically with ENOMEM.  This is undocumented

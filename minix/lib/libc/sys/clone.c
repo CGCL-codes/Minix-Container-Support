@@ -28,7 +28,6 @@ int clone(int (*fn)(void *), void *stack, int flags, void *arg)
 
     pid_t pid = _syscall(PM_PROC_NR, PM_FORK, &m);
     if(pid != 0) {
-		// 父进程态
         if((flags & CLONE_NEWUTS) == CLONE_NEWUTS){
 			mysysctl_uts_clone(pid);
 		}

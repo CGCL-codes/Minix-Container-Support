@@ -1112,7 +1112,6 @@ mib_getptr(struct mib_node * node)
 			return &node->node_quad;
 		break;
 	case CTLTYPE_STRING:
-		// printf("tree.c mib_getptr STRING before \n");
 		if (node->node_name != NULL && strcmp(node->node_name ,"hostname") == 0 && node->utsid != 0) {
 				printf("tree.c mib_getptr STRING node->utsid is: %d \n" , node->utsid);
 				return hostname_uts[node->utsid];	/* find local hostname in a certain uts */
@@ -1142,8 +1141,9 @@ mib_read(struct mib_node * node, struct mib_oldp * oldp)
 	if ((ptr = mib_getptr(node)) == NULL)
 		return EINVAL;
 
-	if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_STRING)
-		oldlen = strlen(node->node_data) + 1;
+	if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_STRING){
+		oldlen = strlen(ptr) + 1;
+	}
 	else
 		oldlen = node->node_size;
 
@@ -1331,7 +1331,6 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	ssize_t len;
 	int r;
 	
-	// printf("tree.c mib_readwrite before \n");
 	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {		/* for node 'hostname' ,find uts id for parent process*/
 		node->utsid = mib_getutsid(call->call_utspendpt);	
 		printf("tree.c mib_readwrite node->utsid is %d \n" , node->utsid);
