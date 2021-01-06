@@ -188,8 +188,19 @@ static void do_reply(struct worker_thread *wp)
 {
   struct vmnt *vmp = NULL;
 
-  if(who_e != VM_PROC_NR && (vmp = find_vmnt(who_e)) == NULL)
-	panic("Couldn't find vmnt for endpoint %d", who_e);
+  if (who_e != VM_PROC_NR) {
+    if (m_in.m_fs_vfs_reply.mnt_ns_flag == 1) {
+		vmp = find_vmnt_in_fproc(who_e);
+		//vmnt_in_proc = vmnt;
+	} else {
+		vmp = find_vmnt(who_e);
+	}
+
+	if (vmp == NULL) {
+		panic("Couldn't find vmnt for endpoint %d", who_e);
+	}
+  }
+  //vmp = find_vmnt(who_e);
 
   if (wp->w_task != who_e) {
 	printf("VFS: tid %d: expected %d to reply, not %d\n",

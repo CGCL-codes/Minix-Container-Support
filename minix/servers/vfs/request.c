@@ -247,6 +247,12 @@ int req_statvfs(endpoint_t fs_e, struct statvfs *buf)
   m.m_type = REQ_STATVFS;
   m.m_vfs_fs_statvfs.grant = grant_id;
 
+  if (vmnt_in_proc != vmnt && vmnt_in_proc != NULL) {
+    m.m_vfs_fs_statvfs.mnt_ns_flag = 1;
+  } else {
+    m.m_vfs_fs_statvfs.mnt_ns_flag = -1;
+  }
+
   /* Send/rec request */
   r = fs_sendrec(fs_e, &m);
   cpf_revoke(grant_id);
@@ -613,6 +619,12 @@ int req_mountpoint(endpoint_t fs_e, ino_t inode_nr)
   m.m_type = REQ_MOUNTPOINT;
   m.m_vfs_fs_mountpoint.inode = inode_nr;
 
+  if (vmnt_in_proc != vmnt && vmnt_in_proc != NULL) {
+    m.m_vfs_fs_mountpoint.mnt_ns_flag = 1;
+  } else {
+    m.m_vfs_fs_mountpoint.mnt_ns_flag = -1;
+  }
+
   /* Send/rec request */
   return fs_sendrec(fs_e, &m);
 }
@@ -808,6 +820,12 @@ int req_readsuper(
   m.m_vfs_fs_readsuper.grant = grant_id;
   m.m_vfs_fs_readsuper.device = dev;
   m.m_vfs_fs_readsuper.path_len = len;
+
+  if (vmnt_in_proc != vmnt && vmnt_in_proc != NULL) {
+    m.m_vfs_fs_readsuper.mnt_ns_flag = 1;
+  } else {
+    m.m_vfs_fs_readsuper.mnt_ns_flag = -1;
+  }
 
   /* Send/rec request */
   r = fs_sendrec(fs_e, &m);

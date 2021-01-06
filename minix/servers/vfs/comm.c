@@ -136,7 +136,7 @@ int fs_sendrec(endpoint_t fs_e, message *reqmp)
   struct vmnt *vmp;
   int r;
 
-  if (reqmp->m_type == REQ_MOUNTPOINT || reqmp->m_type == REQ_READSUPER) {
+  if (vmnt_in_proc != vmnt && vmnt_in_proc != NULL && (reqmp->m_type == REQ_MOUNTPOINT || reqmp->m_type == REQ_READSUPER || reqmp->m_type == REQ_STATVFS || reqmp->m_type == REQ_NEW_DRIVER)) {
     vmp = find_vmnt_in_fproc(fs_e);
   } else {
     vmp = find_vmnt(fs_e);

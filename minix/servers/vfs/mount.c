@@ -381,6 +381,8 @@ endpoint_t mnt_e )
   if (!(new_vmp->m_flags & VMNT_FORCEROOTBSF))
 	update_bspec(dev, fs_e, 0 /* Don't send new driver endpoint */);
 
+  vmnt_in_proc = vmnt;
+
   unlock_vnode(vp);
   unlock_vnode(root_node);
   unlock_vmnt(new_vmp);

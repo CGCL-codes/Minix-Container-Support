@@ -49,6 +49,12 @@ fsdriver_process(const struct fsdriver * __restrict fdp,
 	/* Send a reply. */
 	m_out.m_type = TRNS_ADD_ID(r, transid);
 
+	if ((call_nr == REQ_MOUNTPOINT && m_ptr->m_vfs_fs_mountpoint.mnt_ns_flag == 1) || (call_nr == REQ_READSUPER && m_ptr->m_vfs_fs_readsuper.mnt_ns_flag == 1) || (call_nr == REQ_STATVFS && m_ptr->m_vfs_fs_statvfs.mnt_ns_flag == 1)) {
+		m_out.m_fs_vfs_reply.mnt_ns_flag = 1;
+	} else {
+		m_out.m_fs_vfs_reply.mnt_ns_flag = -1;
+	}
+
 	if (asyn_reply)
 		r = asynsend(m_ptr->m_source, &m_out);
 	else
