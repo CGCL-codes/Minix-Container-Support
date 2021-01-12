@@ -120,7 +120,7 @@ void thread_cleanup(void);
 /* misc.c */
 void pm_exit(void);
 int do_fcntl(void);
-void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid);
+void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag);
 void pm_setgid(endpoint_t proc_e, int egid, int rgid);
 void pm_setuid(endpoint_t proc_e, int euid, int ruid);
 void pm_setgroups(endpoint_t proc_e, int ngroups, gid_t *addr);

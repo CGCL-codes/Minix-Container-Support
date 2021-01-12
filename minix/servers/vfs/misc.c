@@ -574,7 +574,7 @@ pm_reboot(void)
 /*===========================================================================*
  *				pm_fork					     *
  *===========================================================================*/
-void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid)
+void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
 {
 /* Perform those aspects of the fork() system call that relate to files.
  * In particular, let the child inherit its parent's file descriptors.
