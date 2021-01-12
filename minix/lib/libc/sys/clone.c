@@ -9,12 +9,13 @@
 
 #include <sys/sysctl.h>
 #include <stdio.h>
+#include "extern.h"
 
 #ifdef __weak_alias
 __weak_alias(clone, _clone)
 #endif
 
-int mysysctl_uts_clone(int cpid);
+// int mysysctl_uts_clone(int cpid);
 
 int clone(int (*fn)(void *), void *stack, int flags, void *arg)
 {
@@ -29,7 +30,8 @@ int clone(int (*fn)(void *), void *stack, int flags, void *arg)
     pid_t pid = _syscall(PM_PROC_NR, PM_FORK, &m);
     if(pid != 0) {
         if((flags & CLONE_NEWUTS) == CLONE_NEWUTS){
-			mysysctl_uts_clone(pid);
+			// mysysctl_uts_clone(pid);
+			__sysctluts(NULL, NULL, NULL, 0, pid);
 		}
 		
         return pid;
@@ -39,6 +41,7 @@ int clone(int (*fn)(void *), void *stack, int flags, void *arg)
     }
 }
 
+/*
 int mysysctl_uts_clone(int cpid)
 {
 	message m;
@@ -58,11 +61,12 @@ int mysysctl_uts_clone(int cpid)
 	memcpy(m.m_lc_mib_sysctl.name, mib, sizeof(*mib) * 2);
 	
 	m.m_lc_mib_sysctl.uts_pendpt = getppid();     
-	printf("clone father process ID:%d\n", m.m_lc_mib_sysctl.uts_pendpt);
+	// printf("clone father process ID:%d\n", m.m_lc_mib_sysctl.uts_pendpt);
 	m.m_lc_mib_sysctl.uts_cendpt = cpid;			
-	printf("clone child process ID:%d\n", m.m_lc_mib_sysctl.uts_cendpt);
+	// printf("clone child process ID:%d\n", m.m_lc_mib_sysctl.uts_cendpt);
 	
 	r = _syscall(MIB_PROC_NR, MIB_SYSCTL, &m);	
 	
 	return r;
 }
+*/

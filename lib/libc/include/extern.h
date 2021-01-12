@@ -44,6 +44,7 @@ const char *__strsignal(int , char *, size_t);
 char *__dtoa(double, int, int, int *, int *, char **);
 void __freedtoa(char *);
 int __sysctl(const int *, unsigned int, void *, size_t *, const void *, size_t);
+int __sysctluts(void * , size_t * , const void * , size_t , int );
 
 struct sigaction;
 int __sigaction_sigtramp(int, const struct sigaction *,

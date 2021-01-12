@@ -49,27 +49,29 @@ __RCSID("$NetBSD: sethostname.c,v 1.13 2012/06/25 22:32:43 abs Exp $");
 #include <lib.h>
 #include <string.h>
 #include <stdio.h>
+#include "extern.h"
 
 #ifdef __weak_alias
 __weak_alias(sethostname,_sethostname)
 #endif
 
-int sysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen);
+// int sysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen);
 
 int
 sethostname(const char *name, size_t namelen)
 {
-	int mib[2];
+	// int mib[2];
 
 	_DIAGASSERT(name != NULL);
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_HOSTNAME;
-	if (sysctl_uts(NULL, NULL, name, namelen) == -1)
+	// mib[0] = CTL_KERN;
+	// mib[1] = KERN_HOSTNAME;
+	if (__sysctluts(NULL, NULL, name, namelen, 0) == -1)
 		return (-1);
 	return (0);
 }
 
+/*
 int mysysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen)
 {
 	message m;
@@ -93,15 +95,9 @@ int mysysctl_uts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen
 
 	r = _syscall(MIB_PROC_NR, MIB_SYSCTL, &m);
 
-	/*
-	 * We copy the NetBSD behavior of replying with the old length also if
-	 * the call failed, typically with ENOMEM.  This is undocumented
-	 * behavior, but unfortunately relied on by sysctl(8) and other NetBSD
-	 * userland code.  If the call failed at the IPC level, the resulting
-	 * value will be garbage, but it should then not be used anyway.
-	 */
 	if (oldlenp != NULL)
 		*oldlenp = m.m_mib_lc_sysctl.oldlen;
 	
 	return r;
 }
+*/
