@@ -62,7 +62,10 @@ sethostname(const char *name, size_t namelen)
 {
 	_DIAGASSERT(name != NULL);
 
-	if (__sysctluts(NULL, NULL, name, namelen, 0) == -1)
+	if (__sysctluts(NULL, NULL, name, namelen) == -1)
 		return (-1);
+
+	// if (__sysctluts(NULL, NULL, name, namelen, 0) == -1)
+		// return (-1);
 	return (0);
 }
