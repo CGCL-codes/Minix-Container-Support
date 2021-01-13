@@ -15,9 +15,11 @@ int status;
   void (*suicide)(void);
   message m;
 
+  printf("exit to pm before ");
   memset(&m, 0, sizeof(m));
   m.m_lc_pm_exit.status = status;
   _syscall(PM_PROC_NR, PM_EXIT, &m);
+  printf("exit to pm after ");
 
   /* If exiting nicely through PM fails for some reason, try to
    * commit suicide. E.g., message to PM might fail due to deadlock.

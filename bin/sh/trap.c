@@ -481,4 +481,5 @@ l1:   handler = &loc2;			/* probably unnecessary */
 #endif
 l2:   _exit(status);
 	/* NOTREACHED */
+	TRACE(("exitshell\n"));
 }

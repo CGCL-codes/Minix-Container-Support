@@ -15,7 +15,7 @@
 __weak_alias(clone, _clone)
 #endif
 
-// int mysysctl_uts_clone(int cpid);
+int mysysctl_uts_clone(int cpid);
 
 int clone(int (*fn)(void *), void *stack, int flags, void *arg)
 {
@@ -30,8 +30,8 @@ int clone(int (*fn)(void *), void *stack, int flags, void *arg)
     pid_t pid = _syscall(PM_PROC_NR, PM_FORK, &m);
     if(pid != 0) {
         if((flags & CLONE_NEWUTS) == CLONE_NEWUTS){
-			// mysysctl_uts_clone(pid);
-			__sysctluts(NULL, NULL, NULL, 0, pid);
+		 mysysctl_uts_clone(pid);
+			// __sysctluts(NULL, NULL, NULL, 0, pid);
 		}
 		
         return pid;
@@ -41,7 +41,6 @@ int clone(int (*fn)(void *), void *stack, int flags, void *arg)
     }
 }
 
-/*
 int mysysctl_uts_clone(int cpid)
 {
 	message m;
@@ -69,4 +68,3 @@ int mysysctl_uts_clone(int cpid)
 	
 	return r;
 }
-*/
