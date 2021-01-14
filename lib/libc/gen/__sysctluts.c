@@ -3,8 +3,7 @@
 #include <sys/sysctl.h>
 #include <string.h>
 #include <unistd.h>
-
-// #include "extern.h"
+#include "extern.h"
 
 int __sysctluts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen)
 {

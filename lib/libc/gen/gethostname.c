@@ -49,7 +49,7 @@ __RCSID("$NetBSD: gethostname.c,v 1.13 2012/06/25 22:32:43 abs Exp $");
 #include <lib.h>
 #include <string.h>
 #include <stdio.h>
-// #include "extern.h"
+#include "extern.h"
 
 
 #ifdef __weak_alias

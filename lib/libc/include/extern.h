@@ -45,6 +45,7 @@ char *__dtoa(double, int, int, int *, int *, char **);
 void __freedtoa(char *);
 int __sysctl(const int *, unsigned int, void *, size_t *, const void *, size_t);
 // int __sysctluts(void * , size_t * , const void * , size_t , int );
+int __sysctluts(void * , size_t * , const void * , size_t );
 
 struct sigaction;
 int __sigaction_sigtramp(int, const struct sigaction *,

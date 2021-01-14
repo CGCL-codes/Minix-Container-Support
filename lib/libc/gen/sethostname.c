@@ -55,7 +55,7 @@ __RCSID("$NetBSD: sethostname.c,v 1.13 2012/06/25 22:32:43 abs Exp $");
 __weak_alias(sethostname,_sethostname)
 #endif
 
-int __sysctluts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen);
+// int __sysctluts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen);
 
 int
 sethostname(const char *name, size_t namelen)
