@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <stdio.h>
+
 #ifdef __weak_alias
 __weak_alias(_Exit, _exit)
 #endif

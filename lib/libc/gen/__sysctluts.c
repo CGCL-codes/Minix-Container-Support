@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "extern.h"
 
+/* 
 int __sysctluts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen)
 {
 	message m;
@@ -28,15 +29,10 @@ int __sysctluts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen)
 
 	r = _syscall(MIB_PROC_NR, MIB_SYSCTL, &m);
 	
-	/*
-	 * We copy the NetBSD behavior of replying with the old length also if
-	 * the call failed, typically with ENOMEM.  This is undocumented
-	 * behavior, but unfortunately relied on by sysctl(8) and other NetBSD
-	 * userland code.  If the call failed at the IPC level, the resulting
-	 * value will be garbage, but it should then not be used anyway.
-	 */
 	if (oldlenp != NULL)
 		*oldlenp = m.m_mib_lc_sysctl.oldlen;
 	
 	return r;
 }
+
+*/

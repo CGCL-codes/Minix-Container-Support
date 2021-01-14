@@ -72,7 +72,7 @@ gethostname(char *name, size_t namelen)
 	return (0);
 }
 
-/*
+
 int __sysctluts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen)
 {
 	message m;
@@ -101,7 +101,7 @@ int __sysctluts(void * oldp, size_t * oldlenp, const void * newp, size_t newlen)
 	
 	return r;
 }
-*/
+
 
 
 
