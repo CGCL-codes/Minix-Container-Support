@@ -15,7 +15,7 @@
 __weak_alias(clone, _clone)
 #endif
 
-int mysysctl_uts_clone(int cpid, int utstype);
+int mysysctl_uts_clone(int cpid);
 
 int clone(int (*fn)(void *), void *stack, int flags, void *arg)
 {
