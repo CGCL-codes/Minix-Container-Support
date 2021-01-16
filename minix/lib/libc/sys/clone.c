@@ -15,7 +15,7 @@
 __weak_alias(clone, _clone)
 #endif
 
-int mysysctl_uts_clone(int cpid);
+int mysysctl_uts_clone(int cpid, int utstype);
 
 int clone(int (*fn)(void *), void *stack, int flags, void *arg)
 {
@@ -63,7 +63,7 @@ int mysysctl_uts_clone(int cpid)
 	// printf("clone father process ID:%d\n", m.m_lc_mib_sysctl.uts_pendpt);
 	m.m_lc_mib_sysctl.uts_cendpt = cpid;			
 	// printf("clone child process ID:%d\n", m.m_lc_mib_sysctl.uts_cendpt);
-	
+	m.m_lc_mib_sysctl.uts_type = 2;
 	r = _syscall(MIB_PROC_NR, MIB_SYSCTL, &m);	
 	
 	return r;

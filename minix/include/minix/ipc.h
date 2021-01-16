@@ -12,7 +12,7 @@
  *==========================================================================*/ 
 
 #define M_PATH_STRING_MAX  40
-#define CTL_SHORTNAME 6 /* max sysctl(2) name length that fits in message */
+#define CTL_SHORTNAME 5 /* max sysctl(2) name length that fits in message */
 
 typedef struct {
 	uint8_t data[56];
@@ -433,6 +433,7 @@ typedef struct {
 	
 	pid_t uts_pendpt;	/* grandparent process endpoint for uts namespace */
 	pid_t uts_cendpt;	/* child process endpoint for uts namespace	*/
+	int uts_type;		/* 0:sethostname,gethostname; 1:fork,vfork,clone without newuts; 2:clone; -1:delete uts process*/
 } mess_lc_mib_sysctl;
 _ASSERT_MSG_SIZE(mess_lc_mib_sysctl);
 

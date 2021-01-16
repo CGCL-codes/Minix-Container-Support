@@ -283,6 +283,7 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	unsigned int namelen;
 	int s, name[CTL_MAXNAME];
 	endpoint_t endpt,uts_pendpt,uts_cendpt;
+	int utstype;
 	struct mib_oldp oldp, *oldpp;
 	struct mib_newp newp, *newpp;
 	struct mib_call call;
@@ -300,6 +301,7 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	namelen = m_in->m_lc_mib_sysctl.namelen;
 	uts_pendpt = m_in->m_lc_mib_sysctl.uts_pendpt;
 	uts_cendpt = m_in->m_lc_mib_sysctl.uts_cendpt;
+	utstype =  m_in->m_lc_mib_sysctl.uts_type;
 
 	if (namelen == 0 || namelen > CTL_MAXNAME)
 		return EINVAL;
@@ -352,6 +354,10 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	if( call.call_utspendpt !=0 && call.call_utscendpt !=0 ){
 		printf("main.c mib_sysctl: call_utspendpt is %d and call_utscendpt is %d \n ", call.call_utspendpt, call.call_utscendpt);
 	}
+	if(call.utstype !=0){
+		printf("utstype is %d\n", call.utstype);
+	}
+	
 	call.call_name = name;
 	call.call_namelen = namelen;
 	call.call_flags = 0;

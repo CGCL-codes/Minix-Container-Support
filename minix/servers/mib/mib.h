@@ -53,7 +53,7 @@ struct mib_call {
 	
 	endpoint_t call_utspendpt;	/* endpoint of grandparent process */
 	endpoint_t call_utscendpt;	/* endpoint of child process */
-	
+	int call_utstype;
 };
 
 /* Call flags. */

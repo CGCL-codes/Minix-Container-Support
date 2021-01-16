@@ -61,6 +61,8 @@ __RCSID("$NetBSD: trap.c,v 1.37 2015/08/22 12:12:47 christos Exp $");
 #include "mystring.h"
 #include "var.h"
 
+#include <stdio.h>
+
 
 /*
  * Sigmode records the current value of the signal handlers for the various
@@ -463,6 +465,7 @@ exitshell(int status)
 	char *p;
 
 	TRACE(("pid %d, exitshell(%d)\n", getpid(), status));
+	printf("pid %d, exitshell(%d)\n", getpid(), status);
 	if (setjmp(loc1.loc)) {
 		goto l1;
 	}
@@ -481,5 +484,5 @@ l1:   handler = &loc2;			/* probably unnecessary */
 #endif
 l2:   _exit(status);
 	/* NOTREACHED */
-	TRACE(("exitshell\n"));
+	printf("exitshell\n");
 }

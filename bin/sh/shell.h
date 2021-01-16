@@ -84,6 +84,6 @@ extern const char nullstr[1];		/* null string */
 #define TRACE(param)	trace param
 #define TRACEV(param)	tracev param
 #else
-#define TRACE(param)    printf##param
+#define TRACE(param)
 #define TRACEV(param)
 #endif
