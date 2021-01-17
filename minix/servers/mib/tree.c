@@ -1389,9 +1389,12 @@ void debug(int utstype){
 		default:
 			c = "getset";
 	}
+
+	
 	for (size_t i = 0; i < 5; i++)
 	{
-		printf("tree.c mib_readwrite : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
+		printf("kern.c mib_readwrite %s: _proc_uts[%d] , endpt is: %d , utsid is %d \n", c, i, _proc_uts[i].endpt, _proc_uts[i].utsid);
+		printf("tree.c mib_readwrite %s: hostname_uts[%d] is: %s \n" , c, i , hostname_uts[i]);
 	}
 }
 

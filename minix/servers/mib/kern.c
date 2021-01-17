@@ -108,7 +108,6 @@ int mib_createutsandaddnewprocess(int p_utsid, endpoint_t c_endpt)
 	}
 
 	utsspace[ifree]++;
-	
 	return ifree;
 }
 
