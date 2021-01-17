@@ -376,7 +376,9 @@ extern unsigned int mib_remotes;
 
 /* kern.c */
 int mib_getutsid(endpoint_t endpt);
-int mib_createnewuts(int p_utsid, endpoint_t c_endpt);
+int mib_createutsandaddnewprocess(int p_utsid, endpoint_t c_endpt);
+int mib_addutsnewprocess(int pid, int utsid);
+int mib_deleteprocessinuts(int endpt);
 
 /* remote.c */
 void mib_remote_init(void);

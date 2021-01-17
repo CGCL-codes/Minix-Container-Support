@@ -1170,18 +1170,6 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	size_t newlen;
 	int r;
 	
-	// printf("tree.c mib_write before \n");
-	if (call->call_utscendpt != 0) {		/* clone a new space*/
-
-		int cid = 0;
-		if ((cid = mib_createnewuts(node->utsid, call->call_utscendpt)) == ENOMEM) {
-			return ENOMEM;
-		}
-		printf("tree.c mib_write cid is %d \n" , cid);
-		return OK;
-	}
-	// printf("tree.c mib_write after \n");
-
 	if (newp == NULL)
 		return OK; /* nothing to do */
 
@@ -1330,10 +1318,43 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 {
 	ssize_t len;
 	int r;
-	
+	int utstype;
+
 	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {		/* for node 'hostname' ,find uts id for parent process*/
 		node->utsid = mib_getutsid(call->call_utspendpt);	
 		printf("tree.c mib_readwrite node->utsid is %d \n" , node->utsid);
+
+		utstype = call->call_utstype;
+		switch(utstype){
+			case 1:
+				mib_addutsnewprocess(call->call_utsendpt, node->utsid);
+				break;
+			case 2:
+				{		
+					/* clone a new space*/
+					int cid = 0;
+					if ((cid = mib_createutsandaddnewprocess(node->utsid, call->call_utscendpt)) == ENOMEM) {
+						return ENOMEM;
+					}
+					printf("tree.c mib_write cid is %d \n" , cid);
+					break;
+				}
+			case -1:{
+				/* delete a process in a uts space */
+				int uid = mib_deleteprocessinuts(call->call_utspendpt);
+				break;
+			}
+			case 3:
+				break;
+			case 4:
+				break;
+		}
+
+		if(utstype != 0){
+			debug(utstype);
+			return OK;
+		}
+
 	}
 
 	/* Copy out old data, if requested.  Always get the old data length. */
@@ -1344,16 +1365,34 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	if ((r = mib_write(call, node, newp, verify)) != OK)
 		return r;
 	
-	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {	
-		for (size_t i = 0; i < 5; i++)
-		{
-			printf("tree.c mib_readwrite : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
-		}
+	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {
+		debug(0);	
 	}
-
 
 	/* Return the old data length. */
 	return len;
+}
+
+void debug(int utstype){
+
+	char* c = "\0";
+	switch(utstype){
+		case 1:
+			c = "fork";
+			break;
+		case 2:
+			c = "clone";
+			break;
+		case -1:
+			c = "delete";
+			break;
+		default:
+			c = "getset";
+	}
+	for (size_t i = 0; i < 5; i++)
+	{
+		printf("tree.c mib_readwrite : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
+	}
 }
 
 /*

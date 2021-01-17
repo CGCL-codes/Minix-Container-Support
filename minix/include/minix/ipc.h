@@ -1385,7 +1385,7 @@ typedef struct {
 	unsigned int	clen;
 	unsigned int	miblen;
 	int		mib[CTL_SHORTNAME];
-	uint8_t		padding[12];
+	uint8_t		padding[16];
 } mess_lsys_mib_register;
 _ASSERT_MSG_SIZE(mess_lsys_mib_register);
 
