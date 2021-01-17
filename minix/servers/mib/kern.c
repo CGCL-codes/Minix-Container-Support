@@ -108,14 +108,7 @@ int mib_createutsandaddnewprocess(int p_utsid, endpoint_t c_endpt)
 	}
 
 	utsspace[ifree]++;
-
-	printf("kern.c mib_createnewuts hostname is %s \n", hostname);
-	for (int k = 0; k < 5; k++)
-	{
-		printf("kern.c mib_createnewuts : hostname_uts[%d] is: %s \n", k, hostname_uts[k]);
-		printf("kern.c mib_createnewuts : _proc_uts[%d] , endpt is: %d , utsid is %d \n", k, _proc_uts[k].endpt, _proc_uts[k].utsid);
-	}
-
+	
 	return ifree;
 }
 
