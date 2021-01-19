@@ -44,13 +44,13 @@
  * it may be used by third parties.
  */
 static struct mib_node mib_table[] = {
-/* 1*/	[CTL_KERN]	= MIB_ENODE(_P | _RO, "kern", "High kernel"),
-/* 2*/	[CTL_VM]	= MIB_ENODE(_P | _RO, "vm", "Virtual memory"),
-/* 4*/	[CTL_NET]	= MIB_ENODE(_P | _RO, "net", "Networking"),
-/* 6*/	[CTL_HW]	= MIB_ENODE(_P | _RO, "hw", "Generic CPU, I/O"),
-/* 8*/	[CTL_USER]	= MIB_ENODE(_P | _RO, "user", "User-level"),
-/*11*/	[CTL_VENDOR]	= MIB_ENODE(_P | _RW, "vendor", "Vendor specific"),
-/*32*/	[CTL_MINIX]	= MIB_ENODE(_P | _RO, "minix", "MINIX3 specific"),
+	/* 1*/ [CTL_KERN] = MIB_ENODE(_P | _RO, "kern", "High kernel"),
+	/* 2*/[CTL_VM] = MIB_ENODE(_P | _RO, "vm", "Virtual memory"),
+	/* 4*/[CTL_NET] = MIB_ENODE(_P | _RO, "net", "Networking"),
+	/* 6*/[CTL_HW] = MIB_ENODE(_P | _RO, "hw", "Generic CPU, I/O"),
+	/* 8*/[CTL_USER] = MIB_ENODE(_P | _RO, "user", "User-level"),
+	/*11*/[CTL_VENDOR] = MIB_ENODE(_P | _RW, "vendor", "Vendor specific"),
+	/*32*/[CTL_MINIX] = MIB_ENODE(_P | _RO, "minix", "MINIX3 specific"),
 };
 
 /*
@@ -67,7 +67,8 @@ struct mib_node mib_root = MIB_NODE(_RW, mib_table, "", "");
  * to implement storage of small data results in the sysctl reply message, so
  * as to avoid the kernel copy, without changing any of the handler code.
  */
-struct mib_oldp {
+struct mib_oldp
+{
 	endpoint_t oldp_endpt;
 	vir_bytes oldp_addr;
 	size_t oldp_len;
@@ -76,7 +77,8 @@ struct mib_oldp {
  * Same structure, different type: prevent accidental mixups, and avoid the
  * need to use __restrict everywhere.
  */
-struct mib_newp {
+struct mib_newp
+{
 	endpoint_t newp_endpt;
 	vir_bytes newp_addr;
 	size_t newp_len;
@@ -87,8 +89,7 @@ struct mib_newp {
  * of data that is to be copied out.  This call can be used to test whether
  * certain bits of data need to be prepared for copying at all.
  */
-int
-mib_inrange(struct mib_oldp * oldp, size_t off)
+int mib_inrange(struct mib_oldp *oldp, size_t off)
 {
 
 	if (oldp == NULL)
@@ -103,7 +104,7 @@ mib_inrange(struct mib_oldp * oldp, size_t off)
  * where the request semantics blatantly violate overall sysctl(2) semantics.
  */
 size_t
-mib_getoldlen(struct mib_oldp * oldp)
+mib_getoldlen(struct mib_oldp *oldp)
 {
 
 	if (oldp == NULL)
@@ -118,8 +119,8 @@ mib_getoldlen(struct mib_oldp * oldp)
  * success (for the caller's convenience) or an error code on failure.
  */
 ssize_t
-mib_copyout(struct mib_oldp * __restrict oldp, size_t off,
-	const void * __restrict buf, size_t size)
+mib_copyout(struct mib_oldp *__restrict oldp, size_t off,
+			const void *__restrict buf, size_t size)
 {
 	size_t len;
 	int r;
@@ -134,7 +135,7 @@ mib_copyout(struct mib_oldp * __restrict oldp, size_t off,
 		len = oldp->oldp_len - off;
 
 	if ((r = sys_datacopy(SELF, (vir_bytes)buf, oldp->oldp_endpt,
-	    oldp->oldp_addr + off, len)) != OK)
+						  oldp->oldp_addr + off, len)) != OK)
 		return r;
 
 	return size;
@@ -144,8 +145,7 @@ mib_copyout(struct mib_oldp * __restrict oldp, size_t off,
  * Override the oldlen value returned from the call, in situations where an
  * error is thrown as well.
  */
-void
-mib_setoldlen(struct mib_call * call, size_t oldlen)
+void mib_setoldlen(struct mib_call *call, size_t oldlen)
 {
 
 	call->call_reslen = oldlen;
@@ -156,7 +156,7 @@ mib_setoldlen(struct mib_call * call, size_t oldlen)
  * supply new data.
  */
 size_t
-mib_getnewlen(struct mib_newp * newp)
+mib_getnewlen(struct mib_newp *newp)
 {
 
 	if (newp == NULL)
@@ -169,9 +169,8 @@ mib_getnewlen(struct mib_newp * newp)
  * Copy in data from the user.  The given length must match exactly the length
  * given by the user.  Return OK or an error code.
  */
-int
-mib_copyin(struct mib_newp * __restrict newp, void * __restrict buf,
-	size_t len)
+int mib_copyin(struct mib_newp *__restrict newp, void *__restrict buf,
+			   size_t len)
 {
 
 	if (newp == NULL || len != newp->newp_len)
@@ -181,16 +180,15 @@ mib_copyin(struct mib_newp * __restrict newp, void * __restrict buf,
 		return OK;
 
 	return sys_datacopy(newp->newp_endpt, newp->newp_addr, SELF,
-	    (vir_bytes)buf, len);
+						(vir_bytes)buf, len);
 }
 
 /*
  * Copy in auxiliary data from the user, based on a user pointer obtained from
  * data copied in earlier through mib_copyin().
  */
-int
-mib_copyin_aux(struct mib_newp * __restrict newp, vir_bytes addr,
-	void * __restrict buf, size_t len)
+int mib_copyin_aux(struct mib_newp *__restrict newp, vir_bytes addr,
+				   void *__restrict buf, size_t len)
 {
 
 	assert(newp != NULL);
@@ -207,18 +205,20 @@ mib_copyin_aux(struct mib_newp * __restrict newp, vir_bytes addr,
  * length in lenp, and return OK.  On error, return an error code that must not
  * be ENOMEM.
  */
-int
-mib_relay_oldp(endpoint_t endpt, struct mib_oldp * __restrict oldp,
-	cp_grant_id_t * grantp, size_t * __restrict lenp)
+int mib_relay_oldp(endpoint_t endpt, struct mib_oldp *__restrict oldp,
+				   cp_grant_id_t *grantp, size_t *__restrict lenp)
 {
 
-	if (oldp != NULL) {
+	if (oldp != NULL)
+	{
 		*grantp = cpf_grant_magic(endpt, oldp->oldp_endpt,
-		    oldp->oldp_addr, oldp->oldp_len, CPF_WRITE);
+								  oldp->oldp_addr, oldp->oldp_len, CPF_WRITE);
 		if (!GRANT_VALID(*grantp))
 			return EINVAL;
 		*lenp = oldp->oldp_len;
-	} else {
+	}
+	else
+	{
 		*grantp = GRANT_INVALID;
 		*lenp = 0;
 	}
@@ -232,18 +232,20 @@ mib_relay_oldp(endpoint_t endpt, struct mib_oldp * __restrict oldp,
  * length in lenp, and return OK.  On error, return an error code that must not
  * be ENOMEM.
  */
-int
-mib_relay_newp(endpoint_t endpt, struct mib_newp * __restrict newp,
-	cp_grant_id_t * grantp, size_t * __restrict lenp)
+int mib_relay_newp(endpoint_t endpt, struct mib_newp *__restrict newp,
+				   cp_grant_id_t *grantp, size_t *__restrict lenp)
 {
 
-	if (newp != NULL) {
+	if (newp != NULL)
+	{
 		*grantp = cpf_grant_magic(endpt, newp->newp_endpt,
-		    newp->newp_addr, newp->newp_len, CPF_READ);
+								  newp->newp_addr, newp->newp_len, CPF_READ);
 		if (!GRANT_VALID(*grantp))
 			return EINVAL;
 		*lenp = newp->newp_len;
-	} else {
+	}
+	else
+	{
 		*grantp = GRANT_INVALID;
 		*lenp = 0;
 	}
@@ -256,11 +258,11 @@ mib_relay_newp(endpoint_t endpt, struct mib_newp * __restrict newp,
  * function returns a nonzero value if this is the case, and zero otherwise.
  * Authorization is performed only once per call.
  */
-int
-mib_authed(struct mib_call * call)
+int mib_authed(struct mib_call *call)
 {
 
-	if ((call->call_flags & (MIB_FLAG_AUTH | MIB_FLAG_NOAUTH)) == 0) {
+	if ((call->call_flags & (MIB_FLAG_AUTH | MIB_FLAG_NOAUTH)) == 0)
+	{
 		/* Ask PM if this endpoint has superuser privileges. */
 		if (getnuid(call->call_endpt) == SUPER_USER)
 			call->call_flags |= MIB_FLAG_AUTH;
@@ -275,14 +277,14 @@ mib_authed(struct mib_call * call)
  * Implement the sysctl(2) system call.
  */
 static int
-mib_sysctl(message * __restrict m_in, int ipc_status,
-	message * __restrict m_out)
+mib_sysctl(message *__restrict m_in, int ipc_status,
+		   message *__restrict m_out)
 {
 	vir_bytes oldaddr, newaddr;
 	size_t oldlen, newlen;
 	unsigned int namelen;
 	int s, name[CTL_MAXNAME];
-	endpoint_t endpt,uts_pendpt,uts_cendpt;
+	endpoint_t endpt, uts_pendpt, uts_cendpt;
 	int utstype;
 	struct mib_oldp oldp, *oldpp;
 	struct mib_newp newp, *newpp;
@@ -301,7 +303,7 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	namelen = m_in->m_lc_mib_sysctl.namelen;
 	uts_pendpt = m_in->m_lc_mib_sysctl.uts_pendpt;
 	uts_cendpt = m_in->m_lc_mib_sysctl.uts_cendpt;
-	utstype =  m_in->m_lc_mib_sysctl.uts_type;
+	utstype = m_in->m_lc_mib_sysctl.uts_type;
 
 	if (namelen == 0 || namelen > CTL_MAXNAME)
 		return EINVAL;
@@ -310,37 +312,43 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	 * In most cases, the entire name fits in the request message, so we
 	 * can avoid a kernel copy.
 	 */
-	if (namelen > CTL_SHORTNAME) {
+	if (namelen > CTL_SHORTNAME)
+	{
 		if ((s = sys_datacopy(endpt, m_in->m_lc_mib_sysctl.namep, SELF,
-		    (vir_bytes)&name, sizeof(name[0]) * namelen)) != OK)
+							  (vir_bytes)&name, sizeof(name[0]) * namelen)) != OK)
 			return s;
-	} else
+	}
+	else
 		memcpy(name, m_in->m_lc_mib_sysctl.name,
-		    sizeof(name[0]) * namelen);
+			   sizeof(name[0]) * namelen);
 
 	/*
 	 * Set up a structure for the old data, if any.  When no old address is
 	 * given, be forgiving if oldlen is not zero, as the user may simply
 	 * not have initialized the variable before passing a pointer to it.
 	 */
-	if (oldaddr != 0) {
+	if (oldaddr != 0)
+	{
 		oldp.oldp_endpt = endpt;
 		oldp.oldp_addr = oldaddr;
 		oldp.oldp_len = oldlen;
 		oldpp = &oldp;
-	} else
+	}
+	else
 		oldpp = NULL;
 
 	/*
 	 * Set up a structure for the new data, if any.  If one of newaddr and
 	 * newlen is zero but not the other, we (like NetBSD) disregard both.
 	 */
-	if (newaddr != 0 && newlen != 0) {
+	if (newaddr != 0 && newlen != 0)
+	{
 		newp.newp_endpt = endpt;
 		newp.newp_addr = newaddr;
 		newp.newp_len = newlen;
 		newpp = &newp;
-	} else
+	}
+	else
 		newpp = NULL;
 
 	/*
@@ -351,13 +359,15 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	call.call_endpt = endpt;
 	call.call_utspendpt = uts_pendpt;
 	call.call_utscendpt = uts_cendpt;
-	if( call.call_utspendpt !=0 && call.call_utscendpt !=0 ){
+	if (call.call_utspendpt != 0 && call.call_utscendpt != 0)
+	{
 		printf("main.c mib_sysctl: call_utspendpt is %d and call_utscendpt is %d \n ", call.call_utspendpt, call.call_utscendpt);
 	}
-	if(call.utstype !=0){
+	if (call.utstype != 0)
+	{
 		printf("utstype is %d\n", call.utstype);
 	}
-	
+
 	call.call_name = name;
 	call.call_namelen = namelen;
 	call.call_flags = 0;
@@ -378,14 +388,16 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
 	 * creation resulted in a collision, in which case the error code is
 	 * EEXIST while the existing node is copied out as well.
 	 */
-	if (r >= 0) {
+	if (r >= 0)
+	{
 		m_out->m_mib_lc_sysctl.oldlen = (size_t)r;
 
 		if (oldaddr != 0 && oldlen < (size_t)r)
 			r = ENOMEM;
 		else
 			r = OK;
-	} else
+	}
+	else
 		m_out->m_mib_lc_sysctl.oldlen = call.call_reslen;
 
 	return r;
@@ -395,7 +407,7 @@ mib_sysctl(message * __restrict m_in, int ipc_status,
  * Initialize the service.
  */
 static int
-mib_init(int type __unused, sef_init_info_t * info __unused)
+mib_init(int type __unused, sef_init_info_t *info __unused)
 {
 
 	/*
@@ -443,8 +455,7 @@ mib_startup(void)
 /*
  * The Management Information Base (MIB) service.
  */
-int
-main(void)
+int main(void)
 {
 	message m_in, m_out;
 	int r, ipc_status;
@@ -453,13 +464,15 @@ main(void)
 	mib_startup();
 
 	/* The main message loop. */
-	for (;;) {
+	for (;;)
+	{
 		/* Receive a request. */
 		if ((r = sef_receive_status(ANY, &m_in, &ipc_status)) != OK)
 			panic("sef_receive failed: %d", r);
 
 		/* Process the request. */
-		if (is_ipc_notify(ipc_status)) {
+		if (is_ipc_notify(ipc_status))
+		{
 			/* We are not expecting any notifications. */
 			printf("MIB: notification from %d\n", m_in.m_source);
 
@@ -468,7 +481,8 @@ main(void)
 
 		memset(&m_out, 0, sizeof(m_out));
 
-		switch (m_in.m_type) {
+		switch (m_in.m_type)
+		{
 		case MIB_SYSCTL:
 			r = mib_sysctl(&m_in, ipc_status, &m_out);
 
@@ -492,7 +506,8 @@ main(void)
 		}
 
 		/* Send a reply, if applicable. */
-		if (r != EDONTREPLY) {
+		if (r != EDONTREPLY)
+		{
 			m_out.m_type = r;
 
 			if ((r = ipc_sendnb(m_in.m_source, &m_out)) != OK)

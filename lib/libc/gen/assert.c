@@ -78,8 +78,7 @@ enum {
 
 static int	diagassert_flags = -1;
 
-void
-__diagassert13(const char *file, int line, const char *function,
+static void __diagassert13(const char *file, int line, const char *function,
     const char *failedexpr)
 {
 	char buf[1024];

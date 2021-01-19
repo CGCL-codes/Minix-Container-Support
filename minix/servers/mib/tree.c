@@ -18,13 +18,13 @@
  * storage for data being written in the majority of cases.  Finally, it must
  * be large enough to contain an entire page, for mib_copyin_str().
  */
-#define MAXDESCLEN	1024	/* from NetBSD */
-#define SCRATCH_SIZE	MAX(PAGE_SIZE, sizeof(struct sysctldesc) + MAXDESCLEN)
+#define MAXDESCLEN 1024 /* from NetBSD */
+#define SCRATCH_SIZE MAX(PAGE_SIZE, sizeof(struct sysctldesc) + MAXDESCLEN)
 static char scratch[SCRATCH_SIZE] __aligned(sizeof(int32_t));
 
-unsigned int mib_nodes;		/* how many nodes are there in the tree? */
-unsigned int mib_objects;	/* how many memory objects are allocated? */
-unsigned int mib_remotes;	/* how many remote subtrees are there? */
+unsigned int mib_nodes;	  /* how many nodes are there in the tree? */
+unsigned int mib_objects; /* how many memory objects are allocated? */
+unsigned int mib_remotes; /* how many remote subtrees are there? */
 
 /*
  * Find a node through its parent node and identifier.  Return the node if it
@@ -32,7 +32,7 @@ unsigned int mib_remotes;	/* how many remote subtrees are there? */
  * superstructure (for removal).  If no matching node was found, return NULL.
  */
 static struct mib_node *
-mib_find(struct mib_node * parent, int id, struct mib_dynode *** prevpp)
+mib_find(struct mib_node *parent, int id, struct mib_dynode ***prevpp)
 {
 	struct mib_node *node;
 	struct mib_dynode **dynp;
@@ -45,10 +45,12 @@ mib_find(struct mib_node * parent, int id, struct mib_dynode *** prevpp)
 	 * all in a single array, so lookup is O(1) for these nodes.  We use
 	 * the node flags field to see whether the array entry is valid.
 	 */
-	if (IS_STATIC_ID(parent, id)) {
+	if (IS_STATIC_ID(parent, id))
+	{
 		node = &parent->node_scptr[id];
 
-		if (node->node_flags != 0) {
+		if (node->node_flags != 0)
+		{
 			/* Found a matching static node. */
 			if (prevpp != NULL)
 				*prevpp = NULL;
@@ -67,13 +69,16 @@ mib_find(struct mib_node * parent, int id, struct mib_dynode *** prevpp)
 	 * we may be able to stop the search early.
 	 */
 	for (dynp = &parent->node_dcptr; *dynp != NULL;
-	    dynp = &((*dynp)->dynode_next)) {
-		if ((*dynp)->dynode_id == id) {
+		 dynp = &((*dynp)->dynode_next))
+	{
+		if ((*dynp)->dynode_id == id)
+		{
 			/* Found a matching dynamic node. */
 			if (prevpp != NULL)
 				*prevpp = dynp;
 			return &(*dynp)->dynode_node;
-		} else if ((*dynp)->dynode_id > id)
+		}
+		else if ((*dynp)->dynode_id > id)
 			break; /* no need to look further */
 	}
 
@@ -88,8 +93,8 @@ mib_find(struct mib_node * parent, int id, struct mib_dynode *** prevpp)
  * to indicate that nothing was copied out after all (this is unused here).
  */
 static ssize_t
-mib_copyout_node(struct mib_call * call, struct mib_oldp * oldp, size_t off,
-	int id, const struct mib_node * node)
+mib_copyout_node(struct mib_call *call, struct mib_oldp *oldp, size_t off,
+				 int id, const struct mib_node *node)
 {
 	struct sysctlnode scn;
 	int visible;
@@ -105,7 +110,7 @@ mib_copyout_node(struct mib_call * call, struct mib_oldp * oldp, size_t off,
 	 * Either way, do not expose them to userland.
 	 */
 	scn.sysctl_flags = SYSCTL_VERSION | (node->node_flags &
-	    ~(CTLFLAG_PARENT | CTLFLAG_VERIFY | CTLFLAG_REMOTE));
+										 ~(CTLFLAG_PARENT | CTLFLAG_VERIFY | CTLFLAG_REMOTE));
 	scn.sysctl_num = id;
 	strlcpy(scn.sysctl_name, node->node_name, sizeof(scn.sysctl_name));
 	scn.sysctl_ver = node->node_ver;
@@ -118,8 +123,10 @@ mib_copyout_node(struct mib_call * call, struct mib_oldp * oldp, size_t off,
 	 * For immediate types, store the immediate value in the resulting
 	 * structure, unless the caller is not authorized to obtain the value.
 	 */
-	if ((node->node_flags & CTLFLAG_IMMEDIATE) && visible) {
-		switch (SYSCTL_TYPE(node->node_flags)) {
+	if ((node->node_flags & CTLFLAG_IMMEDIATE) && visible)
+	{
+		switch (SYSCTL_TYPE(node->node_flags))
+		{
 		case CTLTYPE_BOOL:
 			scn.sysctl_bdata = node->node_bool;
 			break;
@@ -132,7 +139,8 @@ mib_copyout_node(struct mib_call * call, struct mib_oldp * oldp, size_t off,
 	}
 
 	/* Special rules apply to parent nodes. */
-	if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_NODE) {
+	if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_NODE)
+	{
 		/* Report the node size the way NetBSD does, just in case. */
 		scn.sysctl_size = sizeof(scn);
 
@@ -154,17 +162,23 @@ mib_copyout_node(struct mib_call * call, struct mib_oldp * oldp, size_t off,
 		 * expected in these parts of the tree.  Do not return the real
 		 * function pointer, as this would leak anti-ASR information.
 		 */
-		if (node->node_flags & CTLFLAG_REMOTE) {
-			if (visible) {
+		if (node->node_flags & CTLFLAG_REMOTE)
+		{
+			if (visible)
+			{
 				scn.sysctl_csize = node->node_rcsize;
 				scn.sysctl_clen = node->node_rclen;
 			}
-		} else if (node->node_flags & CTLFLAG_PARENT) {
-			if (visible) {
+		}
+		else if (node->node_flags & CTLFLAG_PARENT)
+		{
+			if (visible)
+			{
 				scn.sysctl_csize = node->node_csize;
 				scn.sysctl_clen = node->node_clen;
 			}
-		} else
+		}
+		else
 			scn.sysctl_func = SYSCTL_NODE_FN;
 	}
 
@@ -177,8 +191,8 @@ mib_copyout_node(struct mib_call * call, struct mib_oldp * oldp, size_t off,
  * this node's children.
  */
 static ssize_t
-mib_query(struct mib_call * call, struct mib_node * parent,
-	struct mib_oldp * oldp, struct mib_newp * newp)
+mib_query(struct mib_call *call, struct mib_node *parent,
+		  struct mib_oldp *oldp, struct mib_newp *newp)
 {
 	struct sysctlnode scn;
 	struct mib_node *node;
@@ -187,7 +201,8 @@ mib_query(struct mib_call * call, struct mib_node * parent,
 	int r, id;
 
 	/* If the user passed in version numbers, check them. */
-	if (newp != NULL) {
+	if (newp != NULL)
+	{
 		if ((r = mib_copyin(newp, &scn, sizeof(scn))) != OK)
 			return r;
 
@@ -199,8 +214,8 @@ mib_query(struct mib_call * call, struct mib_node * parent,
 		 * of the parent or the root.
 		 */
 		if (scn.sysctl_ver != 0 &&
-		    scn.sysctl_ver != mib_root.node_ver &&
-		    scn.sysctl_ver != parent->node_ver)
+			scn.sysctl_ver != mib_root.node_ver &&
+			scn.sysctl_ver != parent->node_ver)
 			return EINVAL;
 	}
 
@@ -213,7 +228,8 @@ mib_query(struct mib_call * call, struct mib_node * parent,
 	off = 0;
 
 	/* First enumerate the static nodes. */
-	for (id = 0; IS_STATIC_ID(parent, id); id++) {
+	for (id = 0; IS_STATIC_ID(parent, id); id++)
+	{
 		node = &parent->node_scptr[id];
 
 		if (node->node_flags == 0)
@@ -226,11 +242,12 @@ mib_query(struct mib_call * call, struct mib_node * parent,
 
 	/* Then enumerate the dynamic nodes. */
 	for (dynode = parent->node_dcptr; dynode != NULL;
-	    dynode = dynode->dynode_next) {
+		 dynode = dynode->dynode_next)
+	{
 		node = &dynode->dynode_node;
 
 		if ((r = mib_copyout_node(call, oldp, off, dynode->dynode_id,
-		    node)) < 0)
+								  node)) < 0)
 			return r;
 		off += r;
 	}
@@ -245,18 +262,19 @@ mib_query(struct mib_call * call, struct mib_node * parent,
  * Otherwise, return zero to indicate failure.
  */
 static size_t
-mib_check_name(const char * name, size_t namesize)
+mib_check_name(const char *name, size_t namesize)
 {
 	size_t namelen;
 	char c;
 
 	/* Names must be nonempty, null terminated, C symbol style strings. */
-	for (namelen = 0; namelen < namesize; namelen++) {
+	for (namelen = 0; namelen < namesize; namelen++)
+	{
 		if ((c = name[namelen]) == '\0')
 			break;
 		/* A-Z, a-z, 0-9, _ only, and no digit as first character. */
 		if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-		    c == '_' || (c >= '0' && c <= '9' && namelen > 0)))
+			  c == '_' || (c >= '0' && c <= '9' && namelen > 0)))
 			return 0;
 	}
 	if (namelen == 0 || namelen == namesize)
@@ -275,8 +293,8 @@ mib_check_name(const char * name, size_t namesize)
  * the ID of the conflicting node, and 'nodep' will point to the node.
  */
 static int
-mib_scan(struct mib_node * parent, int given_id, const char * name, int * idp,
-	struct mib_dynode *** prevpp, struct mib_node ** nodep)
+mib_scan(struct mib_node *parent, int given_id, const char *name, int *idp,
+		 struct mib_dynode ***prevpp, struct mib_node **nodep)
 {
 	struct mib_dynode **prevp, **dynp;
 	struct mib_node *node;
@@ -303,11 +321,13 @@ mib_scan(struct mib_node * parent, int given_id, const char * name, int * idp,
 	 */
 
 	/* First check the static node array, just for collisions. */
-	for (id = 0; IS_STATIC_ID(parent, id); id++) {
+	for (id = 0; IS_STATIC_ID(parent, id); id++)
+	{
 		node = &parent->node_scptr[id];
 		if (node->node_flags == 0)
 			continue;
-		if (id == given_id || !strcmp(name, node->node_name)) {
+		if (id == given_id || !strcmp(name, node->node_name))
+		{
 			*idp = id;
 			*nodep = node;
 			return EEXIST;
@@ -324,18 +344,23 @@ mib_scan(struct mib_node * parent, int given_id, const char * name, int * idp,
 		id = MAX(CREATE_BASE, parent->node_size);
 
 	for (prevp = &parent->node_dcptr; *prevp != NULL;
-	    prevp = &((*prevp)->dynode_next)) {
+		 prevp = &((*prevp)->dynode_next))
+	{
 		if ((*prevp)->dynode_id > id)
 			break;
-		if ((*prevp)->dynode_id == id) {
-			if (given_id >= 0) {
+		if ((*prevp)->dynode_id == id)
+		{
+			if (given_id >= 0)
+			{
 				*idp = id;
 				*nodep = &(*prevp)->dynode_node;
 				return EEXIST;
-			} else
+			}
+			else
 				id++;
 		}
-		if (!strcmp(name, (*prevp)->dynode_node.node_name)) {
+		if (!strcmp(name, (*prevp)->dynode_node.node_name))
+		{
 			*idp = (*prevp)->dynode_id;
 			*nodep = &(*prevp)->dynode_node;
 			return EEXIST;
@@ -343,10 +368,12 @@ mib_scan(struct mib_node * parent, int given_id, const char * name, int * idp,
 	}
 
 	/* Finally, check the rest of the dynamic nodes for name collisions. */
-	for (dynp = prevp; *dynp != NULL; dynp = &((*dynp)->dynode_next)) {
+	for (dynp = prevp; *dynp != NULL; dynp = &((*dynp)->dynode_next))
+	{
 		assert((*dynp)->dynode_id > id);
 
-		if (!strcmp(name, (*dynp)->dynode_node.node_name)) {
+		if (!strcmp(name, (*dynp)->dynode_node.node_name))
+		{
 			*idp = (*dynp)->dynode_id;
 			*nodep = &(*dynp)->dynode_node;
 			return EEXIST;
@@ -369,8 +396,8 @@ mib_scan(struct mib_node * parent, int given_id, const char * name, int * idp,
  * would fit in the given buffer.
  */
 static int
-mib_copyin_str(struct mib_newp * __restrict newp, vir_bytes addr,
-	char * __restrict buf, size_t bufsize, size_t * __restrict sizep)
+mib_copyin_str(struct mib_newp *__restrict newp, vir_bytes addr,
+			   char *__restrict buf, size_t bufsize, size_t *__restrict sizep)
 {
 	char *ptr, *endp;
 	size_t chunk, len;
@@ -394,7 +421,8 @@ mib_copyin_str(struct mib_newp * __restrict newp, vir_bytes addr,
 	 */
 	len = 0;
 
-	while (bufsize > 0) {
+	while (bufsize > 0)
+	{
 		chunk = PAGE_SIZE - (addr % PAGE_SIZE);
 		if (chunk > bufsize)
 			chunk = bufsize;
@@ -403,7 +431,8 @@ mib_copyin_str(struct mib_newp * __restrict newp, vir_bytes addr,
 		if ((r = mib_copyin_aux(newp, addr, ptr, chunk)) != OK)
 			return r;
 
-		if ((endp = memchr(ptr, '\0', chunk)) != NULL) {
+		if ((endp = memchr(ptr, '\0', chunk)) != NULL)
+		{
 			/* A null terminator was found - success. */
 			if (sizep != NULL)
 				*sizep = len + (size_t)(endp - ptr) + 1;
@@ -424,7 +453,7 @@ mib_copyin_str(struct mib_newp * __restrict newp, vir_bytes addr,
  * nodes on the path to the given node, including that node itself.
  */
 static void
-mib_upgrade(struct mib_node * node)
+mib_upgrade(struct mib_node *node)
 {
 	uint32_t ver;
 
@@ -441,7 +470,8 @@ mib_upgrade(struct mib_node * node)
 		ver = 1;
 
 	/* Copy the new version to all the nodes on the path. */
-	do {
+	do
+	{
 		node->node_ver = ver;
 
 		node = node->node_parent;
@@ -454,7 +484,7 @@ mib_upgrade(struct mib_node * node)
  * versions and counters accordingly.  This function never fails.
  */
 static void
-mib_add(struct mib_dynode * dynode, struct mib_dynode ** prevp)
+mib_add(struct mib_dynode *dynode, struct mib_dynode **prevp)
 {
 	struct mib_node *parent;
 
@@ -484,8 +514,8 @@ mib_add(struct mib_dynode * dynode, struct mib_dynode ** prevp)
  * Create a node.
  */
 static ssize_t
-mib_create(struct mib_call * call, struct mib_node * parent,
-	struct mib_oldp * oldp, struct mib_newp * newp)
+mib_create(struct mib_call *call, struct mib_node *parent,
+		   struct mib_oldp *oldp, struct mib_newp *newp)
 {
 	struct mib_dynode *dynode, **prevp;
 	struct mib_node *node;
@@ -542,7 +572,7 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 	 * *not* used for the node being created.
 	 */
 	if (scn.sysctl_ver != 0 && scn.sysctl_ver != mib_root.node_ver &&
-	    scn.sysctl_ver != parent->node_ver)
+		scn.sysctl_ver != parent->node_ver)
 		return EINVAL;
 
 	/*
@@ -550,10 +580,11 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 	 * we also allow UNSIGNED, and leave its interpretation to userland.
 	 */
 	if (SYSCTL_FLAGS(scn.sysctl_flags) &
-	    ~(SYSCTL_USERFLAGS | CTLFLAG_UNSIGNED))
+		~(SYSCTL_USERFLAGS | CTLFLAG_UNSIGNED))
 		return EINVAL;
 
-	if (!(scn.sysctl_flags & CTLFLAG_IMMEDIATE)) {
+	if (!(scn.sysctl_flags & CTLFLAG_IMMEDIATE))
+	{
 		/*
 		 * Without either IMMEDIATE or OWNDATA, data pointers are
 		 * actually kernel addresses--a concept we do not support.
@@ -561,14 +592,16 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 		 * allocate extra memory for the data, so force OWNDATA to be.
 		 * set.  Node-type nodes have no data, though.
 		 */
-		if (SYSCTL_TYPE(scn.sysctl_flags) != CTLTYPE_NODE) {
+		if (SYSCTL_TYPE(scn.sysctl_flags) != CTLTYPE_NODE)
+		{
 			if (!(scn.sysctl_flags & CTLFLAG_OWNDATA) &&
-			    scn.sysctl_data != NULL)
+				scn.sysctl_data != NULL)
 				return EINVAL; /* not meaningful on MINIX3 */
 
 			scn.sysctl_flags |= CTLFLAG_OWNDATA;
 		}
-	} else if (scn.sysctl_flags & CTLFLAG_OWNDATA)
+	}
+	else if (scn.sysctl_flags & CTLFLAG_OWNDATA)
 		return EINVAL;
 
 	/* The READWRITE flag consists of multiple bits.  Sanitize. */
@@ -576,7 +609,8 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 		scn.sysctl_flags |= CTLFLAG_READWRITE;
 
 	/* Validate the node type and size, and do some additional checks. */
-	switch (SYSCTL_TYPE(scn.sysctl_flags)) {
+	switch (SYSCTL_TYPE(scn.sysctl_flags))
+	{
 	case CTLTYPE_BOOL:
 		if (scn.sysctl_size != sizeof(bool))
 			return EINVAL;
@@ -594,10 +628,11 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 		 * For strings, a zero length means that we are supposed to
 		 * allocate a buffer size based on the given string size.
 		 */
-		if (scn.sysctl_size == 0 && scn.sysctl_data != NULL) {
+		if (scn.sysctl_size == 0 && scn.sysctl_data != NULL)
+		{
 			if ((r = mib_copyin_str(newp,
-			    (vir_bytes)scn.sysctl_data, NULL, SSIZE_MAX,
-			    &size)) != OK)
+									(vir_bytes)scn.sysctl_data, NULL, SSIZE_MAX,
+									&size)) != OK)
 				return r;
 			scn.sysctl_size = size;
 		}
@@ -623,7 +658,7 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 		if (scn.sysctl_flags & (CTLFLAG_IMMEDIATE | CTLFLAG_OWNDATA))
 			return EINVAL;
 		if (scn.sysctl_csize != 0 || scn.sysctl_clen != 0 ||
-		    scn.sysctl_child != NULL)
+			scn.sysctl_child != NULL)
 			return EINVAL;
 		break;
 	default:
@@ -645,16 +680,18 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 	 * and find the location at which to insert the new node in the list.
 	 */
 	r = mib_scan(parent, scn.sysctl_num, scn.sysctl_name, &id, &prevp,
-	    &node);
+				 &node);
 
-	if (r != OK) {
+	if (r != OK)
+	{
 		/*
 		 * On collisions, if requested, copy out the existing node.
 		 * This does not quite fit the general interaction model, as
 		 * the service must now return a nonzero old length from a call
 		 * that actually failed (in contrast to ENOMEM failures).
 		 */
-		if (r == EEXIST && oldp != NULL) {
+		if (r == EEXIST && oldp != NULL)
+		{
 			len = mib_copyout_node(call, oldp, 0, id, node);
 
 			if (len > 0)
@@ -700,8 +737,10 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 	node->node_name = dynode->dynode_name;
 
 	/* Initialize the node value. */
-	if (scn.sysctl_flags & CTLFLAG_IMMEDIATE) {
-		switch (SYSCTL_TYPE(scn.sysctl_flags)) {
+	if (scn.sysctl_flags & CTLFLAG_IMMEDIATE)
+	{
+		switch (SYSCTL_TYPE(scn.sysctl_flags))
+		{
 		case CTLTYPE_BOOL:
 			/* Sanitize booleans.  See the C99 _Bool comment. */
 			memcpy(&c, &scn.sysctl_bdata, sizeof(c));
@@ -716,11 +755,14 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 		default:
 			assert(0);
 		}
-	} else if (SYSCTL_TYPE(scn.sysctl_flags) != CTLTYPE_NODE) {
+	}
+	else if (SYSCTL_TYPE(scn.sysctl_flags) != CTLTYPE_NODE)
+	{
 		node->node_data = dynode->dynode_name + namelen + 1;
 
 		/* Did the user supply initial data?  If not, use zeroes. */
-		if (scn.sysctl_data != NULL) {
+		if (scn.sysctl_data != NULL)
+		{
 			/*
 			 * For strings, do not copy in more than needed.  This
 			 * is just a nice feature which allows initialization
@@ -728,13 +770,14 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 			 */
 			if (SYSCTL_TYPE(scn.sysctl_flags) == CTLTYPE_STRING)
 				r = mib_copyin_str(newp,
-				    (vir_bytes)scn.sysctl_data,
-				    node->node_data, scn.sysctl_size, NULL);
+								   (vir_bytes)scn.sysctl_data,
+								   node->node_data, scn.sysctl_size, NULL);
 			else
 				r = mib_copyin_aux(newp,
-				    (vir_bytes)scn.sysctl_data,
-				    node->node_data, scn.sysctl_size);
-		} else
+								   (vir_bytes)scn.sysctl_data,
+								   node->node_data, scn.sysctl_size);
+		}
+		else
 			memset(node->node_data, 0, scn.sysctl_size);
 
 		/*
@@ -742,7 +785,8 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 		 * In this case it is not as big of a deal, as we will not be
 		 * accessing the boolean value directly ourselves.
 		 */
-		if (r == OK && SYSCTL_TYPE(scn.sysctl_flags) == CTLTYPE_BOOL) {
+		if (r == OK && SYSCTL_TYPE(scn.sysctl_flags) == CTLTYPE_BOOL)
+		{
 			b = (bool)*(char *)node->node_data;
 			memcpy(node->node_data, &b, sizeof(b));
 		}
@@ -754,7 +798,8 @@ mib_create(struct mib_call * call, struct mib_node * parent,
 	 */
 
 	/* Deal with earlier failures now. */
-	if (r != OK) {
+	if (r != OK)
+	{
 		free(dynode);
 		mib_objects--;
 
@@ -782,7 +827,7 @@ mib_create(struct mib_call * call, struct mib_node * parent,
  * This function never fails.
  */
 static void
-mib_remove(struct mib_node * node, struct mib_dynode ** prevp)
+mib_remove(struct mib_node *node, struct mib_dynode **prevp)
 {
 	struct mib_dynode *dynode;
 	struct mib_node *parent;
@@ -791,7 +836,8 @@ mib_remove(struct mib_node * node, struct mib_dynode ** prevp)
 	assert(parent != NULL);
 
 	/* If the description was allocated, free it. */
-	if (node->node_flags & CTLFLAG_OWNDESC) {
+	if (node->node_flags & CTLFLAG_OWNDESC)
+	{
 		free(__UNCONST(node->node_desc));
 		mib_objects--;
 	}
@@ -811,7 +857,8 @@ mib_remove(struct mib_node * node, struct mib_dynode ** prevp)
 	 * the node name and any associated data.  Static nodes are zeroed out,
 	 * and the static memory they referenced will become inaccessible.
 	 */
-	if (prevp != NULL) {
+	if (prevp != NULL)
+	{
 		dynode = *prevp;
 		*prevp = dynode->dynode_next;
 
@@ -821,7 +868,8 @@ mib_remove(struct mib_node * node, struct mib_dynode ** prevp)
 		mib_objects--;
 
 		parent->node_csize--;
-	} else
+	}
+	else
 		memset(node, 0, sizeof(*node));
 
 	parent->node_clen--;
@@ -836,8 +884,8 @@ mib_remove(struct mib_node * node, struct mib_dynode ** prevp)
  * Destroy a node.
  */
 static ssize_t
-mib_destroy(struct mib_call * call, struct mib_node * parent,
-	struct mib_oldp * oldp, struct mib_newp * newp)
+mib_destroy(struct mib_call *call, struct mib_node *parent,
+			struct mib_oldp *oldp, struct mib_newp *newp)
 {
 	struct mib_dynode **prevp;
 	struct mib_node *node;
@@ -871,7 +919,8 @@ mib_destroy(struct mib_call * call, struct mib_node * parent,
 		return EPERM;
 
 	/* For node-type nodes, extra rules apply. */
-	if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_NODE) {
+	if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_NODE)
+	{
 		/* The node must not be a mount point. */
 		if (node->node_flags & CTLFLAG_REMOTE)
 			return EBUSY;
@@ -887,15 +936,16 @@ mib_destroy(struct mib_call * call, struct mib_node * parent,
 
 	/* If the user supplied a version, it must match the node version. */
 	if (scn.sysctl_ver != 0 && scn.sysctl_ver != node->node_ver)
-		return EINVAL;	/* NetBSD inconsistently throws ENOENT here */
+		return EINVAL; /* NetBSD inconsistently throws ENOENT here */
 
 	/* If the user supplied a name, it must match the node name. */
-	if (scn.sysctl_name[0] != '\0') {
+	if (scn.sysctl_name[0] != '\0')
+	{
 		if (memchr(scn.sysctl_name, '\0',
-		    sizeof(scn.sysctl_name)) == NULL)
+				   sizeof(scn.sysctl_name)) == NULL)
 			return EINVAL;
 		if (strcmp(scn.sysctl_name, node->node_name))
-			return EINVAL;	/* also ENOENT on NetBSD */
+			return EINVAL; /* also ENOENT on NetBSD */
 	}
 
 	/*
@@ -923,8 +973,8 @@ mib_destroy(struct mib_call * call, struct mib_node * parent,
  * The function may return 0 to indicate that nothing was copied out after all.
  */
 static ssize_t
-mib_copyout_desc(struct mib_call * call, struct mib_oldp * oldp, size_t off,
-	int id, const struct mib_node * node)
+mib_copyout_desc(struct mib_call *call, struct mib_oldp *oldp, size_t off,
+				 int id, const struct mib_node *node)
 {
 	struct sysctldesc *scd;
 	size_t size;
@@ -949,7 +999,7 @@ mib_copyout_desc(struct mib_call * call, struct mib_oldp * oldp, size_t off,
 	scd->descr_len = size;
 	if (node->node_desc != NULL)
 		strlcpy(scd->descr_str, node->node_desc,
-		    sizeof(scratch) - sizeof(*scd));
+				sizeof(scratch) - sizeof(*scd));
 	else
 		scd->descr_str[0] = '\0';
 
@@ -970,8 +1020,8 @@ mib_copyout_desc(struct mib_call * call, struct mib_oldp * oldp, size_t off,
  * node's description.
  */
 static ssize_t
-mib_describe(struct mib_call * call, struct mib_node * parent,
-	struct mib_oldp * oldp, struct mib_newp * newp)
+mib_describe(struct mib_call *call, struct mib_node *parent,
+			 struct mib_oldp *oldp, struct mib_newp *newp)
 {
 	struct sysctlnode scn;
 	struct mib_node *node;
@@ -980,7 +1030,8 @@ mib_describe(struct mib_call * call, struct mib_node * parent,
 	int r, id;
 
 	/* If new data are given, they identify a particular target node. */
-	if (newp != NULL) {
+	if (newp != NULL)
+	{
 		if ((r = mib_copyin(newp, &scn, sizeof(scn))) != OK)
 			return r;
 
@@ -999,7 +1050,8 @@ mib_describe(struct mib_call * call, struct mib_node * parent,
 		 * If a description pointer was given, this is a request to
 		 * set the node's description.
 		 */
-		if (scn.sysctl_desc != NULL) {
+		if (scn.sysctl_desc != NULL)
+		{
 			/* Such a request requires superuser privileges. */
 			if (!mib_authed(call))
 				return EPERM;
@@ -1010,7 +1062,7 @@ mib_describe(struct mib_call * call, struct mib_node * parent,
 			 * of the preexisting underlying node anyway.
 			 */
 			if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_NODE &&
-			    (node->node_flags & CTLFLAG_REMOTE))
+				(node->node_flags & CTLFLAG_REMOTE))
 				return EBUSY;
 
 			/* The node must not already have a description. */
@@ -1027,7 +1079,7 @@ mib_describe(struct mib_call * call, struct mib_node * parent,
 			 * descriptions, and thus, so do we..
 			 */
 			if (scn.sysctl_ver != 0 &&
-			    scn.sysctl_ver != node->node_ver)
+				scn.sysctl_ver != node->node_ver)
 				return EINVAL;
 
 			/*
@@ -1035,12 +1087,13 @@ mib_describe(struct mib_call * call, struct mib_node * parent,
 			 * The length of the description must be reasonable.
 			 */
 			if ((r = mib_copyin_str(newp,
-			    (vir_bytes)scn.sysctl_desc, scratch, MAXDESCLEN,
-			    NULL)) != OK)
+									(vir_bytes)scn.sysctl_desc, scratch, MAXDESCLEN,
+									NULL)) != OK)
 				return r;
 
 			/* Allocate memory and store the description. */
-			if ((node->node_desc = strdup(scratch)) == NULL) {
+			if ((node->node_desc = strdup(scratch)) == NULL)
+			{
 				printf("MIB: out of memory!\n");
 
 				return EINVAL; /* do not return ENOMEM */
@@ -1064,7 +1117,8 @@ mib_describe(struct mib_call * call, struct mib_node * parent,
 	off = 0;
 
 	/* First describe the static nodes. */
-	for (id = 0; IS_STATIC_ID(parent, id); id++) {
+	for (id = 0; IS_STATIC_ID(parent, id); id++)
+	{
 		node = &parent->node_scptr[id];
 
 		if (node->node_flags == 0)
@@ -1077,11 +1131,12 @@ mib_describe(struct mib_call * call, struct mib_node * parent,
 
 	/* Then describe the dynamic nodes. */
 	for (dynode = parent->node_dcptr; dynode != NULL;
-	    dynode = dynode->dynode_next) {
+		 dynode = dynode->dynode_next)
+	{
 		node = &dynode->dynode_node;
 
 		if ((r = mib_copyout_desc(call, oldp, off, dynode->dynode_id,
-		    node)) < 0)
+								  node)) < 0)
 			return r;
 		off += r;
 	}
@@ -1095,10 +1150,11 @@ mib_describe(struct mib_call * call, struct mib_node * parent,
  * result in NULL - as long as the proper rules are followed elsewhere.
  */
 static void *
-mib_getptr(struct mib_node * node)
+mib_getptr(struct mib_node *node)
 {
 
-	switch (SYSCTL_TYPE(node->node_flags)) {
+	switch (SYSCTL_TYPE(node->node_flags))
+	{
 	case CTLTYPE_BOOL:
 		if (node->node_flags & CTLFLAG_IMMEDIATE)
 			return &node->node_bool;
@@ -1112,9 +1168,10 @@ mib_getptr(struct mib_node * node)
 			return &node->node_quad;
 		break;
 	case CTLTYPE_STRING:
-		if (node->node_name != NULL && strcmp(node->node_name ,"hostname") == 0 && node->utsid != 0) {
-				printf("tree.c mib_getptr STRING node->utsid is: %d \n" , node->utsid);
-				return hostname_uts[node->utsid];	/* find local hostname in a certain uts */
+		if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0 && node->utsid != 0)
+		{
+			printf("tree.c mib_getptr STRING node->utsid is: %d \n", node->utsid);
+			return hostname_uts[node->utsid]; /* find local hostname in a certain uts */
 		}
 	case CTLTYPE_STRUCT:
 		if (node->node_flags & CTLFLAG_IMMEDIATE)
@@ -1132,7 +1189,7 @@ mib_getptr(struct mib_node * node)
  * old data length.
  */
 static ssize_t
-mib_read(struct mib_node * node, struct mib_oldp * oldp)
+mib_read(struct mib_node *node, struct mib_oldp *oldp)
 {
 	void *ptr;
 	size_t oldlen;
@@ -1141,7 +1198,8 @@ mib_read(struct mib_node * node, struct mib_oldp * oldp)
 	if ((ptr = mib_getptr(node)) == NULL)
 		return EINVAL;
 
-	if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_STRING){
+	if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_STRING)
+	{
 		oldlen = strlen(ptr) + 1;
 	}
 	else
@@ -1162,14 +1220,14 @@ mib_read(struct mib_node * node, struct mib_oldp * oldp)
  * Write new data into a regular data node, if requested.
  */
 static int
-mib_write(struct mib_call * call, struct mib_node * node,
-	struct mib_newp * newp, mib_verify_ptr verify)
+mib_write(struct mib_call *call, struct mib_node *node,
+		  struct mib_newp *newp, mib_verify_ptr verify)
 {
 	bool b[(sizeof(bool) == sizeof(char)) ? 1 : -1]; /* explained below */
 	char *src, *dst;
 	size_t newlen;
 	int r;
-	
+
 	if (newp == NULL)
 		return OK; /* nothing to do */
 
@@ -1189,7 +1247,8 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	if ((dst = mib_getptr(node)) == NULL)
 		return EINVAL;
 
-	switch (SYSCTL_TYPE(node->node_flags)) {
+	switch (SYSCTL_TYPE(node->node_flags))
+	{
 	case CTLTYPE_BOOL:
 	case CTLTYPE_INT:
 	case CTLTYPE_QUAD:
@@ -1222,7 +1281,8 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	 * before starting the copy, but that would break if we ever add kernel
 	 * threads or anything that allows asynchronous memory unmapping, etc.
 	 */
-	if (newlen + 1 > sizeof(scratch)) {
+	if (newlen + 1 > sizeof(scratch))
+	{
 		/*
 		 * In practice, the temporary buffer is at least an entire
 		 * memory page, which is reasonable by any standard.  As a
@@ -1237,13 +1297,15 @@ mib_write(struct mib_call * call, struct mib_node * node,
 		 * Do not return ENOMEM on allocation failure, because ENOMEM
 		 * implies that a valid old length was returned.
 		 */
-		if ((src = malloc(newlen + 1)) == NULL) {
+		if ((src = malloc(newlen + 1)) == NULL)
+		{
 			printf("MIB: out of memory!\n");
 
 			return EINVAL;
 		}
 		mib_objects++;
-	} else
+	}
+	else
 		src = scratch;
 
 	/* Copy in the data.  Note that newlen may be zero. */
@@ -1253,9 +1315,11 @@ mib_write(struct mib_call * call, struct mib_node * node,
 	if (r == OK && verify != NULL && !verify(call, node, src, newlen))
 		r = EINVAL;
 
-	if (r == OK) {
+	if (r == OK)
+	{
 		/* Check and, if acceptable, store the new value. */
-		switch (SYSCTL_TYPE(node->node_flags)) {
+		switch (SYSCTL_TYPE(node->node_flags))
+		{
 		case CTLTYPE_BOOL:
 			/*
 			 * Due to the nature of the C99 _Bool type, we can not
@@ -1278,7 +1342,8 @@ mib_write(struct mib_call * call, struct mib_node * node,
 			break;
 		case CTLTYPE_STRING:
 			if (newlen == node->node_size &&
-			    src[newlen - 1] != '\0') {
+				src[newlen - 1] != '\0')
+			{
 				/* Our null terminator does not fit! */
 				r = EINVAL;
 				break;
@@ -1298,7 +1363,8 @@ mib_write(struct mib_call * call, struct mib_node * node,
 		}
 	}
 
-	if (src != scratch) {
+	if (src != scratch)
+	{
 		free(src);
 		mib_objects--;
 	}
@@ -1313,48 +1379,52 @@ mib_write(struct mib_call * call, struct mib_node * node,
  * used from handler functions as part of their functionality.
  */
 ssize_t
-mib_readwrite(struct mib_call * call, struct mib_node * node,
-	struct mib_oldp * oldp, struct mib_newp * newp, mib_verify_ptr verify)
+mib_readwrite(struct mib_call *call, struct mib_node *node,
+			  struct mib_oldp *oldp, struct mib_newp *newp, mib_verify_ptr verify)
 {
 	ssize_t len;
 	int r;
 	int utstype;
 
-	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {		/* for node 'hostname' ,find uts id for parent process*/
-		node->utsid = mib_getutsid(call->call_utspendpt);	
-		printf("tree.c mib_readwrite node->utsid is %d \n" , node->utsid);
+	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0)
+	{
+		node->utsid = mib_getutsid(call->call_utspendpt); /* for node 'hostname' ,find utsid where parent process is in */
+		printf("tree.c mib_readwrite node->utsid is %d \n", node->utsid);
 
 		utstype = call->call_utstype;
-		switch(utstype){
-			case 1:
-				mib_addutsnewprocess(call->call_utsendpt, node->utsid);
-				break;
-			case 2:
-				{		
-					/* clone a new space*/
-					int cid = 0;
-					if ((cid = mib_createutsandaddnewprocess(node->utsid, call->call_utscendpt)) == ENOMEM) {
-						return ENOMEM;
-					}
-					printf("tree.c mib_write cid is %d \n" , cid);
-					break;
-				}
-			case -1:{
-				/* delete a process in a uts space */
-				int uid = mib_deleteprocessinuts(call->call_utspendpt);
-				break;
+		switch (utstype)
+		{
+		case 1:
+			mib_addutsnewprocess(call->call_utsendpt, node->utsid); /* fork a new process and put it in its parent's utsspace */
+			break;
+		case 2:
+		{
+			/* clone a new process and create a new space for it */
+			int cid = 0;
+			if ((cid = mib_createutsandaddnewprocess(node->utsid, call->call_utscendpt)) == ENOMEM)
+			{
+				return ENOMEM;
 			}
-			case 3:
-				break;
-			case 4:
-				break;
+			printf("tree.c mib_write cid is %d \n", cid);
+			break;
+		}
+		case -1:
+		{
+			/* delete a process in a utsspace */
+			int uid = mib_deleteprocessinuts(call->call_utspendpt);
+			break;
+		}
+		case 3:
+			break;
+		case 4:
+			break;
 		}
 
-		if(utstype != 0){
+		if (utstype != 0)
+		{
 			debug(utstype);
 			return OK;
 		}
-
 	}
 
 	/* Copy out old data, if requested.  Always get the old data length. */
@@ -1364,37 +1434,39 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	/* Copy in new data, if requested. */
 	if ((r = mib_write(call, node, newp, verify)) != OK)
 		return r;
-	
-	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {
-		debug(0);	
+
+	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0)
+	{
+		debug(0);
 	}
 
 	/* Return the old data length. */
 	return len;
 }
 
-void debug(int utstype){
+void debug(int utstype)
+{
 
-	char* c = "\0";
-	switch(utstype){
-		case 1:
-			c = "fork";
-			break;
-		case 2:
-			c = "clone";
-			break;
-		case -1:
-			c = "delete";
-			break;
-		default:
-			c = "getset";
+	char *c = "\0";
+	switch (utstype)
+	{
+	case 1:
+		c = "fork";
+		break;
+	case 2:
+		c = "clone";
+		break;
+	case -1:
+		c = "delete";
+		break;
+	default:
+		c = "getset";
 	}
 
-	
 	for (size_t i = 0; i < 5; i++)
 	{
-		printf("kern.c mib_readwrite %s: _proc_uts[%d] , endpt is: %d , utsid is %d \n", c, i, _proc_uts[i].endpt, _proc_uts[i].utsid);
-		printf("tree.c mib_readwrite %s: hostname_uts[%d] is: %s \n" , c, i , hostname_uts[i]);
+		printf("tree.c mib_readwrite %s: _proc_uts[%d] , endpt is: %d , utsid is %d \n", c, i, _proc_uts[i].endpt, _proc_uts[i].utsid);
+		printf("tree.c mib_readwrite %s: hostname_uts[%d] is: %s \n", c, i, hostname_uts[i]);
 	}
 }
 
@@ -1404,8 +1476,8 @@ void debug(int utstype){
  * old data length on success, or a negative error code on failure.
  */
 ssize_t
-mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
-	struct mib_newp * newp)
+mib_dispatch(struct mib_call *call, struct mib_oldp *oldp,
+			 struct mib_newp *newp)
 {
 	struct mib_node *parent, *node;
 	ssize_t r;
@@ -1417,7 +1489,8 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
 	 * Resolve the name by descending into the node tree, level by level,
 	 * starting at the MIB root.
 	 */
-	for (parent = &mib_root; call->call_namelen > 0; parent = node) {
+	for (parent = &mib_root; call->call_namelen > 0; parent = node)
+	{
 		id = call->call_name[0];
 		call->call_name++;
 		call->call_namelen--;
@@ -1431,7 +1504,8 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
 		 * with negative identifiers that are not meta-identifiers
 		 * (e.g., see KERN_PROC2).
 		 */
-		if (id < 0) {
+		if (id < 0)
+		{
 			/*
 			 * A meta-identifier must always be the last name
 			 * component.
@@ -1439,7 +1513,8 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
 			if (call->call_namelen > 0)
 				return EINVAL;
 
-			switch (id) {
+			switch (id)
+			{
 			case CTL_QUERY:
 				return mib_query(call, parent, oldp, newp);
 			case CTL_CREATE:
@@ -1475,7 +1550,8 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
 		 */
 		is_leaf = (SYSCTL_TYPE(node->node_flags) != CTLTYPE_NODE);
 
-		if (!is_leaf && (node->node_flags & CTLFLAG_REMOTE)) {
+		if (!is_leaf && (node->node_flags & CTLFLAG_REMOTE))
+		{
 			/* Determine this before 'node' may disappear.. */
 			can_restart = (node->node_flags & CTLFLAG_PARENT);
 
@@ -1496,10 +1572,13 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
 		 * different ways to determine whether there is a function
 		 * depending on whether the node is a leaf or not.
 		 */
-		if (is_leaf) {
+		if (is_leaf)
+		{
 			has_verify = (node->node_flags & CTLFLAG_VERIFY);
 			has_func = (!has_verify && node->node_func != NULL);
-		} else {
+		}
+		else
+		{
 			has_verify = FALSE;
 			has_func = !(node->node_flags & CTLFLAG_PARENT);
 		}
@@ -1517,7 +1596,8 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
 		 * arguable whether we should do this check here already.
 		 * However, for now, this approach covers all our use cases.
 		 */
-		if ((is_leaf || has_func) && newp != NULL) {
+		if ((is_leaf || has_func) && newp != NULL)
+		{
 			if (!(node->node_flags & CTLFLAG_READWRITE))
 				return EPERM;
 
@@ -1527,7 +1607,7 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
 			 * ANYWRITE flag does not override the READWRITE flag.
 			 */
 			if (!(node->node_flags & CTLFLAG_ANYWRITE) &&
-			    !mib_authed(call))
+				!mib_authed(call))
 				return EPERM;
 		}
 
@@ -1538,7 +1618,7 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
 		/* For regular data leaf nodes, handle generic access. */
 		if (is_leaf)
 			return mib_readwrite(call, node, oldp, newp,
-			    has_verify ? node->node_verify : NULL);
+								 has_verify ? node->node_verify : NULL);
 
 		/* No function and not a leaf?  Descend further. */
 	}
@@ -1551,7 +1631,7 @@ mib_dispatch(struct mib_call * call, struct mib_oldp * oldp,
  * Recursively initialize the static tree at initialization time.
  */
 static void
-mib_tree_recurse(struct mib_node * parent)
+mib_tree_recurse(struct mib_node *parent)
 {
 	struct mib_node *node;
 	int id;
@@ -1568,7 +1648,8 @@ mib_tree_recurse(struct mib_node * parent)
 
 	node = parent->node_scptr;
 
-	for (id = 0; IS_STATIC_ID(parent, id); id++, node++) {
+	for (id = 0; IS_STATIC_ID(parent, id); id++, node++)
+	{
 		if (node->node_flags == 0)
 			continue;
 
@@ -1581,7 +1662,7 @@ mib_tree_recurse(struct mib_node * parent)
 
 		/* Recursively apply this function to all node children. */
 		if (SYSCTL_TYPE(node->node_flags) == CTLTYPE_NODE &&
-		    (node->node_flags & CTLFLAG_PARENT))
+			(node->node_flags & CTLFLAG_PARENT))
 			mib_tree_recurse(node);
 	}
 }
@@ -1590,8 +1671,7 @@ mib_tree_recurse(struct mib_node * parent)
  * Go through the entire static tree, recursively, initializing some values
  * that could not be assigned at compile time.
  */
-void
-mib_tree_init(void)
+void mib_tree_init(void)
 {
 
 	/* Initialize some variables. */
@@ -1614,10 +1694,9 @@ mib_tree_init(void)
  * success, with a pointer to the resulting static-node structure stored in
  * 'nodep'.  Return a negative error code on failure.
  */
-int
-mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
-	uint32_t flags, unsigned int csize, unsigned int clen,
-	struct mib_node ** nodep)
+int mib_mount(const int *mib, unsigned int miblen, unsigned int eid, uint32_t rid,
+			  uint32_t flags, unsigned int csize, unsigned int clen,
+			  struct mib_node **nodep)
 {
 	struct mib_dynode *dynode, **prevp;
 	struct mib_node *parent, *node;
@@ -1643,7 +1722,8 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 	 * controlled through a policy specification; unfortunately, this would
 	 * also add a substantial amount of infrastructure.
 	 */
-	if (miblen < 2) {
+	if (miblen < 2)
+	{
 		MIB_DEBUG_MOUNT(("MIB: mounting failed, path too short\n"));
 
 		return EPERM;
@@ -1655,18 +1735,22 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 	 * point, the flag must exactly match the existing node's flags.
 	 */
 	if (SYSCTL_VERS(flags) != SYSCTL_VERSION ||
-	    SYSCTL_TYPE(flags) != CTLTYPE_NODE ||
-	    (SYSCTL_FLAGS(flags) & ~(CTLFLAG_READONLY | CTLFLAG_READWRITE |
-	    CTLFLAG_PERMANENT | CTLFLAG_HIDDEN)) != 0) {
-		MIB_DEBUG_MOUNT(("MIB: mounting failed, invalid flags %"PRIx32
-		    "\n", flags));
+		SYSCTL_TYPE(flags) != CTLTYPE_NODE ||
+		(SYSCTL_FLAGS(flags) & ~(CTLFLAG_READONLY | CTLFLAG_READWRITE |
+								 CTLFLAG_PERMANENT | CTLFLAG_HIDDEN)) != 0)
+	{
+		MIB_DEBUG_MOUNT(("MIB: mounting failed, invalid flags %" PRIx32
+						 "\n",
+						 flags));
 
 		return EINVAL;
 	}
 
-	if (csize > (1U << MIB_RC_BITS) || clen > csize) {
+	if (csize > (1U << MIB_RC_BITS) || clen > csize)
+	{
 		MIB_DEBUG_MOUNT(("MIB: mounting failed, invalid child size or "
-		    "length (%u, %u)\n", csize, clen));
+						 "length (%u, %u)\n",
+						 csize, clen));
 
 		return EINVAL;
 	}
@@ -1683,29 +1767,33 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 	 */
 	parent = &mib_root;
 
-	for (n = 0; n < miblen - 1; n++) {
+	for (n = 0; n < miblen - 1; n++)
+	{
 		/* Meta-identifiers are obviously not allowed in the path. */
-		if ((id = mib[n]) < 0) {
+		if ((id = mib[n]) < 0)
+		{
 			MIB_DEBUG_MOUNT(("MIB: mounting failed, meta-ID in "
-			    "path\n"));
+							 "path\n"));
 
 			return EINVAL;
 		}
 
 		/* Locate the child node. */
-		if ((node = mib_find(parent, id, NULL /*prevp*/)) == NULL) {
+		if ((node = mib_find(parent, id, NULL /*prevp*/)) == NULL)
+		{
 			MIB_DEBUG_MOUNT(("MIB: mounting failed, path not "
-			    "found\n"));
+							 "found\n"));
 
 			return ENOENT;
 		}
 
 		/* Make sure it is a regular node-type node. */
 		if (SYSCTL_TYPE(node->node_flags) != CTLTYPE_NODE ||
-		    !(node->node_flags & CTLFLAG_PARENT) ||
-		    (node->node_flags & (CTLFLAG_REMOTE | CTLFLAG_PRIVATE))) {
+			!(node->node_flags & CTLFLAG_PARENT) ||
+			(node->node_flags & (CTLFLAG_REMOTE | CTLFLAG_PRIVATE)))
+		{
 			MIB_DEBUG_MOUNT(("MIB: mounting failed, unacceptable "
-			    "node on path\n"));
+							 "node on path\n"));
 
 			return EPERM;
 		}
@@ -1714,7 +1802,8 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 	}
 
 	/* Now see if the mount point itself exists. */
-	if ((id = mib[miblen - 1]) < 0) {
+	if ((id = mib[miblen - 1]) < 0)
+	{
 		MIB_DEBUG_MOUNT(("MIB: mounting failed, meta-ID in path\n"));
 
 		return EINVAL;
@@ -1725,17 +1814,19 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 	 * converted to a mount point.  If the target node does not exist, we
 	 * have to allocate a temporary node as mount point.
 	 */
-	if ((node = mib_find(parent, id, NULL /*prevp*/)) != NULL) {
+	if ((node = mib_find(parent, id, NULL /*prevp*/)) != NULL)
+	{
 		/*
 		 * We are about to mount on an existing node.  As stated above,
 		 * the node flags must match the given flags exactly.
 		 */
 		if (SYSCTL_TYPE(node->node_flags) != CTLTYPE_NODE ||
-		    SYSCTL_FLAGS(node->node_flags) !=
-		    (SYSCTL_FLAGS(flags) | CTLFLAG_PARENT)) {
+			SYSCTL_FLAGS(node->node_flags) !=
+				(SYSCTL_FLAGS(flags) | CTLFLAG_PARENT))
+		{
 			MIB_DEBUG_MOUNT(("MIB: mounting failed, target node "
-			    "mismatch (%"PRIx32", %"PRIx32")\n",
-			    node->node_flags, flags));
+							 "mismatch (%" PRIx32 ", %" PRIx32 ")\n",
+							 node->node_flags, flags));
 
 			return EPERM;
 		}
@@ -1744,23 +1835,27 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 		 * If the node has dynamically added children, we will not be
 		 * able to restore the node to its old state when unmounting.
 		 */
-		if (node->node_size != node->node_csize) {
+		if (node->node_size != node->node_csize)
+		{
 			MIB_DEBUG_MOUNT(("MIB: mounting failed, node has "
-			    "dynamic children\n"));
+							 "dynamic children\n"));
 
 			return EBUSY;
 		}
 
 		mib_upgrade(node);
-	} else {
+	}
+	else
+	{
 		/*
 		 * We are going to create a temporary mount point.  Much of the
 		 * procedure that follows is a rather selective extract from
 		 * mib_create().  Start with a check for the impossible.
 		 */
-		if (parent->node_csize == INT_MAX) {
+		if (parent->node_csize == INT_MAX)
+		{
 			MIB_DEBUG_MOUNT(("MIB: mounting failed, parent node "
-			    "full\n"));
+							 "full\n"));
 
 			return EINVAL;
 		}
@@ -1774,15 +1869,18 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 		scratch[0] = '\0';
 
 		if ((r = mib_remote_info(eid, rid, name, sizeof(name), scratch,
-		    MAXDESCLEN)) != OK) {
+								 MAXDESCLEN)) != OK)
+		{
 			MIB_DEBUG_MOUNT(("MIB: mounting failed, node info "
-			    "request yielded %d\n", r));
+							 "request yielded %d\n",
+							 r));
 
 			return r;
 		}
 
 		/* Make sure the name is valid. */
-		if ((namelen = mib_check_name(name, sizeof(name))) == 0) {
+		if ((namelen = mib_check_name(name, sizeof(name))) == 0)
+		{
 			printf("MIB: mounting failed, bad name\n");
 
 			return EINVAL;
@@ -1798,9 +1896,10 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 		 * new node should be inserted upon success.
 		 */
 		if (mib_scan(parent, id, name, &id /*unused*/, &prevp,
-		    &node /*unused*/) != OK) {
+					 &node /*unused*/) != OK)
+		{
 			MIB_DEBUG_MOUNT(("MIB: mounting failed, name "
-			    "conflict\n"));
+							 "conflict\n"));
 
 			return EEXIST;
 		}
@@ -1812,7 +1911,8 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
 		 */
 		size = sizeof(*dynode) + namelen + desclen + 1;
 
-		if ((dynode = malloc(size)) == NULL) {
+		if ((dynode = malloc(size)) == NULL)
+		{
 			printf("MIB: out of memory!\n");
 
 			return ENOMEM;
@@ -1860,8 +1960,7 @@ mib_mount(const int * mib, unsigned int miblen, unsigned int eid, uint32_t rid,
  * change of contents in the subtree.  This function always succeeds, and may
  * deallocate the given node.
  */
-void
-mib_unmount(struct mib_node * node)
+void mib_unmount(struct mib_node *node)
 {
 	struct mib_dynode **prevp;
 	struct mib_node *child;
@@ -1875,7 +1974,8 @@ mib_unmount(struct mib_node * node)
 	 * whether the remote subtree obscured a preexisting node or we created
 	 * a temporary mount point, by checking its CTLFLAG_PARENT flag.
 	 */
-	if (node->node_flags & CTLFLAG_PARENT) {
+	if (node->node_flags & CTLFLAG_PARENT)
+	{
 		/*
 		 * Return the node to its former pre-mount state.  Restore the
 		 * original node_clen field by recomputing it.
@@ -1884,7 +1984,8 @@ mib_unmount(struct mib_node * node)
 		node->node_csize = node->node_size;
 		node->node_clen = 0;
 
-		for (id = 0; IS_STATIC_ID(node, id); id++) {
+		for (id = 0; IS_STATIC_ID(node, id); id++)
+		{
 			child = &node->node_scptr[id];
 
 			if (child->node_flags != 0)
@@ -1895,13 +1996,16 @@ mib_unmount(struct mib_node * node)
 
 		/* Increase version numbers on the path to the node. */
 		mib_upgrade(node);
-	} else {
+	}
+	else
+	{
 		/*
 		 * We know that we dynamically allocated this node; find its
 		 * parent's pointer to it.
 		 */
 		for (prevp = &node->node_parent->node_dcptr; *prevp != NULL;
-		    prevp = &(*prevp)->dynode_next) {
+			 prevp = &(*prevp)->dynode_next)
+		{
 			if (&(*prevp)->dynode_node == node)
 				break;
 		}
