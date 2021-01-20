@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <stdio.h>
+
 #ifdef __weak_alias
 __weak_alias(_Exit, _exit)
 #endif
@@ -15,9 +17,11 @@ int status;
   void (*suicide)(void);
   message m;
 
+  printf("exit to pm before!\n");
   memset(&m, 0, sizeof(m));
   m.m_lc_pm_exit.status = status;
   _syscall(PM_PROC_NR, PM_EXIT, &m);
+  printf("exit to pm after!\n");
 
   /* If exiting nicely through PM fails for some reason, try to
    * commit suicide. E.g., message to PM might fail due to deadlock.
