@@ -109,7 +109,7 @@ int do_getvfsstat(struct statvfs *buf, size_t bufsz, int flags, int count)
 {
 	int i, j;
 
-	if (getvfsstat(buf, bufsz, flags) != count) e(101);
+	if (getvfsstat(buf, bufsz, flags, 0) != count) e(101);
 
 	/* All file system identifiers should be unique. */
 	for (i = 0; i < count - 1; i++) {
@@ -175,15 +175,15 @@ void test55b(void)
 
 	subtest = 2;
 
-	count = getvfsstat(NULL, 0, ST_WAIT);
+	count = getvfsstat(NULL, 0, ST_WAIT, 0);
 	if (count < 2) e(1); /* we have at least the root FS and ProcFS */
 	if (count > FSMAX) e(2);
 
-	if (getvfsstat(buf, 0, ST_WAIT) != 0) e(3);
-	if (getvfsstat(buf, sizeof(buf[0]) - 1, ST_WAIT) != 0) e(4);
-	if (getvfsstat(buf, sizeof(buf[0]), ST_WAIT) != 1) e(5);
-	if (getvfsstat(buf, sizeof(buf[0]) + 1, ST_WAIT) != 1) e(6);
-	if (getvfsstat(buf, sizeof(buf[0]) * 2, ST_WAIT) != 2) e(7);
+	if (getvfsstat(buf, 0, ST_WAIT, 0) != 0) e(3);
+	if (getvfsstat(buf, sizeof(buf[0]) - 1, ST_WAIT, 0) != 0) e(4);
+	if (getvfsstat(buf, sizeof(buf[0]), ST_WAIT, 0) != 1) e(5);
+	if (getvfsstat(buf, sizeof(buf[0]) + 1, ST_WAIT, 0) != 1) e(6);
+	if (getvfsstat(buf, sizeof(buf[0]) * 2, ST_WAIT, 0) != 2) e(7);
 
 	/* We assume that nothing is being un/mounted right now. */
 	root = do_getvfsstat(buf, sizeof(buf), ST_WAIT, count);
