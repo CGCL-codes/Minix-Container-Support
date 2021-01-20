@@ -405,6 +405,11 @@ static int sef_cb_init_fresh(int UNUSED(type), sef_init_info_t *info)
   for (rfp = &fproc[0]; rfp < &fproc[NR_PROCS]; rfp++) {
 	rfp->fp_endpoint = NONE;
 	rfp->fp_pid = PID_FREE;
+	rfp->mnt_num = 0;
+  }
+
+  for (int i = 0; i < NR_PROCS; i++) {
+	  mnt_num_inherit_tab[i] = i;
   }
 
   /* Initialize the process table with help of the process manager messages.

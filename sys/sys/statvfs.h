@@ -154,7 +154,7 @@ int	dostatvfs(struct mount *, struct statvfs *, struct lwp *, int, int);
 __BEGIN_DECLS
 int	statvfs(const char *__restrict, struct statvfs *__restrict);
 int	fstatvfs(int, struct statvfs *);
-int	getvfsstat(struct statvfs *, size_t, int);
+int	getvfsstat(struct statvfs *, size_t, int, int);
 #ifndef __LIBC12_SOURCE__
 int	getmntinfo(struct statvfs **, int) __RENAME(__getmntinfo13);
 #endif /* __LIBC12_SOURCE__ */

@@ -18,6 +18,7 @@ EXTERN struct vmnt {
   char m_mount_dev[PATH_MAX];	/* device from which vmnt is mounted */
   char m_fstype[FSTYPE_MAX];	/* file system type */
   struct statvfs_cache m_stats;	/* cached file system statistics */
+  int mnt_num;
 } vmnt[NR_MNTS];
 
 /* vmnt flags */

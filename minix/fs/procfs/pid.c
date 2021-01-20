@@ -9,6 +9,7 @@ static void pid_psinfo(int slot);
 static void pid_cmdline(int slot);
 static void pid_environ(int slot);
 static void pid_map(int slot);
+static void pid_roots(int slot);
 
 /*
  * The files that are dynamically created in each PID directory.  The data
@@ -20,8 +21,39 @@ struct file pid_files[] = {
 	{ "cmdline",	REG_ALL_MODE,	(data_t) pid_cmdline	},
 	{ "environ",	REG_ALL_MODE,	(data_t) pid_environ	},
 	{ "map",	REG_ALL_MODE,	(data_t) pid_map	},
+	{ "mounts",	REG_ALL_MODE,	(data_t) pid_roots	},
 	{ NULL,		0,		(data_t) NULL		}
 };
+
+/*
+ * Print the list of mounted file systems for the process identified by the given
+ * kernel slot
+ */
+static void pid_roots(int slot)
+{
+	struct statvfs buf[NR_MNTS];
+	struct minix_proc_data mpd;
+	int i, count;
+	pid_t pid;
+
+	if ((pid = pid_from_slot(slot)) == 0)
+		return;
+
+	/* Get the process endpoint. */
+	if (get_proc_data(pid, &mpd) != OK)
+		return;
+
+	if ((count = getvfsstat(buf, sizeof(buf), ST_NOWAIT, mpd.mpd_endpoint)) < 0)
+		return;
+
+	for (i = 0; i < count; i++) {
+		buf_printf("%s on %s type %s (%s)\n", buf[i].f_mntfromname,
+		    buf[i].f_mntonname, buf[i].f_fstypename,
+		    (buf[i].f_flag & ST_RDONLY) ? "ro" : "rw");
+	}
+
+}
+
 
 /*
  * Is the given slot a zombie process?

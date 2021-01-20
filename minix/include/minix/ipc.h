@@ -692,8 +692,9 @@ typedef struct {
 	int32_t flags;
 	size_t len;
 	vir_bytes buf;		/* struct statvfs */
+	endpoint_t endpoint;
 
-	uint8_t padding[44];
+	uint8_t padding[40];
 } mess_lc_vfs_getvfsstat;
 _ASSERT_MSG_SIZE(mess_lc_vfs_getvfsstat);
 

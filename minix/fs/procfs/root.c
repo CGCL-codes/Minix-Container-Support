@@ -216,7 +216,7 @@ root_mounts(void)
 	struct statvfs buf[NR_MNTS];
 	int i, count;
 
-	if ((count = getvfsstat(buf, sizeof(buf), ST_NOWAIT)) < 0)
+	if ((count = getvfsstat(buf, sizeof(buf), ST_NOWAIT, INIT_PROC_NR)) < 0)
 		return;
 
 	for (i = 0; i < count; i++) {

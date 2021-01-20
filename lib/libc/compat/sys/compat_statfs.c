@@ -44,6 +44,7 @@ __RCSID("$NetBSD: compat_statfs.c,v 1.7 2013/10/04 21:07:37 christos Exp $");
 #include <compat/include/fstypes.h>
 #include <string.h>
 #include <stdlib.h>
+#include <minix/com.h>
 
 __warn_references(statfs,
     "warning: reference to obsolete statfs(); use statvfs()")
@@ -181,7 +182,7 @@ __compat_getfsstat(struct statfs12 *ost, long size, int flags)
 	} else
 		nst = NULL;
 
-	if ((ret = getvfsstat(nst, bsize, flags)) == -1)
+	if ((ret = getvfsstat(nst, bsize, flags, INIT_PROC_NR)) == -1)
 		goto done;
 	if (nst)
 		for (i = 0; i < ret; i++)
