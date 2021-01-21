@@ -60,7 +60,7 @@ __RCSID("$NetBSD: trap.c,v 1.37 2015/08/22 12:12:47 christos Exp $");
 #include "trap.h"
 #include "mystring.h"
 #include "var.h"
-
+#include <stdio.h>
 
 /*
  * Sigmode records the current value of the signal handlers for the various
