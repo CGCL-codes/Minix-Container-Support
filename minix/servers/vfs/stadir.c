@@ -388,7 +388,8 @@ int do_getvfsstat(void)
 		if (bufsize < sizeof(struct statvfs))
 			break;
     
-    for (int j = 0; j < i; j++) {
+    int j;
+    for (j = 0; j < i; j++) {
       if (vmp->mnt_num == mnt_num_arr[j]) {
         break;
       }

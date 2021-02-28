@@ -588,6 +588,10 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
   int i, parentno, childno;
   mutex_t c_fp_lock;
 
+  if (new_mntns_flag == 1) {
+	  printf("new_mntns_flag: %d\n", new_mntns_flag);
+  }
+
   /* Check up-to-dateness of fproc. */
   okendpt(pproc, &parentno);
 
