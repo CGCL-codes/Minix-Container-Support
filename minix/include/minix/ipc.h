@@ -756,8 +756,9 @@ typedef struct {
 	vir_bytes path;
 	vir_bytes type;
 	vir_bytes label;
+	endpoint_t mnt_ep;
 
-	uint8_t padding[20];
+	uint8_t padding[16];
 } mess_lc_vfs_mount;
 _ASSERT_MSG_SIZE(mess_lc_vfs_mount);
 

@@ -357,7 +357,6 @@ int do_getvfsstat(void)
   size_t bufsize;
   endpoint_t endpoint;
   int r, flags, count, do_lock;
-  int mnt_num_arr[10];
 
   buf = job_m_in.m_lc_vfs_getvfsstat.buf;
   bufsize = job_m_in.m_lc_vfs_getvfsstat.len;
@@ -377,25 +376,14 @@ int do_getvfsstat(void)
 	do_lock = !(flags & ST_NOWAIT);
 
   int mnt_num_tmp = fpp->mnt_num;
-  int i = 0;
-  for (; mnt_num_tmp != mnt_num_inherit_tab[mnt_num_tmp]; mnt_num_tmp = mnt_num_inherit_tab[mnt_num_tmp]) {
-    mnt_num_arr[i++] = mnt_num_tmp;
-  }
-  mnt_num_arr[i] = -1;
 
-	for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; vmp++) {
+  int i = 1;
+	for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; vmp++, i++) {
 		/* If there is no more space, return the count so far. */
 		if (bufsize < sizeof(struct statvfs))
 			break;
     
-    int j;
-    for (j = 0; j < i; j++) {
-      if (vmp->mnt_num == mnt_num_arr[j]) {
-        break;
-      }
-    }
-
-    if (j == i) {
+    if (mnt_num_vmnt_tab[i][mnt_num_tmp] != 1) {
       continue;
     }
 
