@@ -133,7 +133,6 @@ void init_vmnts(void)
   for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; vmp++) {
 	clear_vmnt(vmp);
 	tll_init(&vmp->m_lock);
-  vmp->mnt_num = 0;
   }
 }
 
