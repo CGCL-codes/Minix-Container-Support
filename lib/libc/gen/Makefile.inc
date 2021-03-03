@@ -48,7 +48,7 @@ SRCS+=	alarm.c alphasort.c arc4random.c assert.c asysctl.c \
 	shquote.c shquotev.c sighold.c sigignore.c siginterrupt.c \
 	siglist.c signal.c signame.c sigrelse.c \
 	sigset.c sigsetops.c sleep.c \
-	stringlist.c sysconf.c sysctl.c sysctlbyname.c sysctlgetmibinfo.c \
+	stringlist.c sysconf.c sysctl.c sysctl_uts.c sysctlbyname.c sysctlgetmibinfo.c \
 	sysctlnametomib.c syslog.c telldir.c time.c \
 	times.c toascii.c tolower_.c ttyname.c ttyslot.c toupper_.c ualarm.c \
 	ulimit.c uname.c unvis.c usleep.c utime.c utimens.c utmp.c \
