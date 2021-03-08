@@ -605,6 +605,12 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
   if (fproc[childno].fp_pid != PID_FREE)
 	panic("VFS: forking on top of in-use child: %d", childno);
 
+  /* Copy the parent's fproc struct to the child. */
+  /* However, the mutex variables belong to a slot and must stay the same. */
+  c_fp_lock = fproc[childno].fp_lock;
+  fproc[childno] = fproc[parentno];
+  fproc[childno].fp_lock = c_fp_lock;
+
   if (new_mntns_flag == 1) {
 	  int mnt_num_of_child = 0;
 	  for (; mnt_num_vmnt_tab[0][mnt_num_of_child] == 1; mnt_num_of_child++);
@@ -617,12 +623,6 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
   } else {
 	  fproc[childno].mnt_num = fproc[parentno].mnt_num;
   }
-
-  /* Copy the parent's fproc struct to the child. */
-  /* However, the mutex variables belong to a slot and must stay the same. */
-  c_fp_lock = fproc[childno].fp_lock;
-  fproc[childno] = fproc[parentno];
-  fproc[childno].fp_lock = c_fp_lock;
 
   /* Increase the counters in the 'filp' table. */
   cp = &fproc[childno];

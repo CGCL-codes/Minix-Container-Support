@@ -350,7 +350,9 @@ endpoint_t mnt_e )
 	unlock_vmnt(new_vmp);
 	have_root++; /* We have a (new) root */
 	unlock_bsf();
-  mnt_num_vmnt_tab[free_vmnt_index + 1][vmntfp -> mnt_num] = 1;
+  if (strcmp(new_vmp->m_label, "fs_imgrd") != 0) {
+    mnt_num_vmnt_tab[free_vmnt_index + 1][vmntfp -> mnt_num] = 1;
+  }
 	return(OK);
   }
 
@@ -386,7 +388,9 @@ endpoint_t mnt_e )
   unlock_vmnt(new_vmp);
   unlock_bsf();
 
-  mnt_num_vmnt_tab[free_vmnt_index + 1][vmntfp -> mnt_num] = 1;
+  if (strcmp(new_vmp->m_label, "fs_imgrd") != 0) {
+    mnt_num_vmnt_tab[free_vmnt_index + 1][vmntfp -> mnt_num] = 1;
+  }
 
   return(OK);
 }
