@@ -18,9 +18,19 @@ static int mib_getfreeprocutsid();
 	add a new item in _proc_uts table to map the new process endpoint with a free uts index, 
 	return the new namespace id */ 
 int mib_createnewuts(int p_utsid, endpoint_t c_endpt) {
+
 	int f_puid = mib_getfreeprocutsid();
 	if (f_puid == -1) return ENOMEM;
 
+	if(c_endpt < 0){	/* fork */
+		if(p_utsid != 0){
+			_proc_uts[f_puid].endpt = -c_endpt;
+			_proc_uts[f_puid].utsid = p_utsid;
+		}
+	
+		return p_utsid;
+	}
+	
 	_proc_uts[f_puid].endpt = c_endpt;
 	/* search for utsspace for a free index */
 	int ifree = 1;

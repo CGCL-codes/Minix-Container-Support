@@ -30,6 +30,9 @@ int clone(int (*fn)(void *), void *stack, int flags, void *arg)
     if(pid != 0) {
         if((flags & CLONE_NEWUTS) == CLONE_NEWUTS){
 			mysysctl_uts_clone(pid);
+		}else{
+
+			mysysctl_uts_clone(-pid);
 		}
 		
         return pid;
@@ -58,7 +61,7 @@ int mysysctl_uts_clone(int cpid)
 	memcpy(m.m_lc_mib_sysctl.name, mib, sizeof(*mib) * 2);
 	
 	m.m_lc_mib_sysctl.uts_pendpt = getppid();     
-	printf("clone father process ID:%d\n", m.m_lc_mib_sysctl.uts_pendpt);
+	// printf("clone father process ID:%d\n", m.m_lc_mib_sysctl.uts_pendpt);
 	m.m_lc_mib_sysctl.uts_cendpt = cpid;			
 	printf("clone child process ID:%d\n", m.m_lc_mib_sysctl.uts_cendpt);
 	

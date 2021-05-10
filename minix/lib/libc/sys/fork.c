@@ -9,6 +9,8 @@
 __weak_alias(fork, _fork)
 #endif
 
+int mysysctl_uts_clone(int cpid);
+
 pid_t fork(void)
 {
   message m;
