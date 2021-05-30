@@ -1113,7 +1113,7 @@ mib_getptr(struct mib_node * node)
 		break;
 	case CTLTYPE_STRING:
 		if (node->node_name != NULL && strcmp(node->node_name ,"hostname") == 0 && node->utsid != 0) {
-				printf("tree.c mib_getptr STRING node->utsid is: %d \n" , node->utsid);
+				//printf("tree.c mib_getptr STRING node->utsid is: %d \n" , node->utsid);
 				return hostname_uts[node->utsid];	/* find local hostname in a certain uts */
 		}
 	case CTLTYPE_STRUCT:
@@ -1177,7 +1177,7 @@ mib_write(struct mib_call * call, struct mib_node * node,
 		if ((cid = mib_createnewuts(node->utsid, call->call_utscendpt)) == ENOMEM) {
 			return ENOMEM;
 		}
-		printf("tree.c mib_write cid is %d \n" , cid);
+		//printf("tree.c mib_write cid is %d \n" , cid);
 		return OK;
 	}
 	// printf("tree.c mib_write after \n");
@@ -1303,7 +1303,7 @@ mib_write(struct mib_call * call, struct mib_node * node,
 			 */
 			src[newlen] = '\0';
 			strlcpy(dst, src, node->node_size);
-			printf("tree.c mib_write dst is %s \n", dst);
+			//printf("tree.c mib_write dst is %s \n", dst);
 			break;
 		default:
 			r = EINVAL;
@@ -1333,7 +1333,7 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	
 	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {		/* for node 'hostname' ,find uts id for parent process*/
 		node->utsid = mib_getutsid(call->call_utspendpt);	
-		printf("tree.c mib_readwrite node->utsid is %d \n" , node->utsid);
+		//printf("tree.c mib_readwrite node->utsid is %d \n" , node->utsid);
 	}
 
 	/* Copy out old data, if requested.  Always get the old data length. */
@@ -1344,12 +1344,12 @@ mib_readwrite(struct mib_call * call, struct mib_node * node,
 	if ((r = mib_write(call, node, newp, verify)) != OK)
 		return r;
 	
-	if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {	
-		for (size_t i = 0; i < 5; i++)
-		{
-			printf("tree.c mib_readwrite : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
-		}
-	}
+	//if (node->node_name != NULL && strcmp(node->node_name, "hostname") == 0) {	
+	//	for (size_t i = 0; i < 5; i++)
+	//	{
+	//		printf("tree.c mib_readwrite : hostname_uts[%d] is: %s \n" , i , hostname_uts[i]);
+	//	}
+	//}
 
 
 	/* Return the old data length. */

@@ -63,7 +63,7 @@ int mysysctl_uts_clone(int cpid)
 	m.m_lc_mib_sysctl.uts_pendpt = getppid();     
 	// printf("clone father process ID:%d\n", m.m_lc_mib_sysctl.uts_pendpt);
 	m.m_lc_mib_sysctl.uts_cendpt = cpid;			
-	printf("clone child process ID:%d\n", m.m_lc_mib_sysctl.uts_cendpt);
+	// printf("clone child process ID:%d\n", m.m_lc_mib_sysctl.uts_cendpt);
 	
 	r = _syscall(MIB_PROC_NR, MIB_SYSCTL, &m);	
 	
