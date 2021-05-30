@@ -33,4 +33,15 @@ mount -t cgroupfs none /mnt
 echo process_pid + ' ' + weight_value > /mnt/cpu/cpu_shares
 # eg. echo '618 1024' > /mnt/cpu/cpu_shares
 ```
-- 
+- We can also write memmory limit information of a certain process to the `vm_limit_in_bytes` file in the `memory` directory.
+```
+# In the initial state, memory usage of each process is limitless.
+echo process_pid + ' ' + vm_limit_in_bytes > /mnt/memory/vm_limit_in_bytes
+# eg. echo '618 10240' > /mnt/memory/vm_limit_in_bytes
+```
+- We can write process state control information of a certain process to the `freezer_state` file in the `freezer` directory.
+```
+# Process suspended -> FROZEN       Process wakeup -> THAWED
+echo process_pid + ' ' + process_state > /mnt/freezer/freezer_state
+eg. echo '618 FROZEN' > /mnt/freezer/freezer_state     echo '618 THAWED' > /mnt/freezer/freezer_state
+```
