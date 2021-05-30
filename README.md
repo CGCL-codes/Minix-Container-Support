@@ -6,11 +6,31 @@ MCRIM makes physical resources of the system user-controllable. The CPU and memo
 
 ### Description
 MCRIM is composed of a pseudo file system and various resource isolation subsystems existing in the user space of operating system: 
-- **Pseudo File System** acts as a medium for users to interact with each resource isolation subsystem, and forwards control information to each resource isolation subsystem.
+- **Pseudo File System** (Cgroupfs) acts as a medium for users to interact with each resource isolation subsystem, and forwards control information to each resource isolation subsystem.
 - Combined with existing process scheduling strategy of system, **CPU Resource Isolation Subsystem** allocates time slices to processes according to CPU weight value set by users, so as to ensure the quantitative allocation of CPU resources. 
 - According to the system’s memory allocation strategy in units of physical blocks, **Memory Resource Isolation Subsystem** determines whether each memory request of target process exceeds the hard limit value set by users, and then determines whether to satisfy its memory request, thereby limiting the amount of memory resources that the process can use. 
 - **Freezer Process Control Subsystem** changes the status flag bit of process in the kernel process table through system calls, and controls running status of the process with the help of process scheduling mechanism in the kernel.
 
 ### Usage
-
-
+- Go to the main directory of source code and switch to `dev` branch. Compile whole system.
+```
+git checkout dev
+make world
+```
+- Reboot the system and install Cgroupfs.
+```
+cd minix/fs/cgroupfs
+make
+make install
+```
+- Mount Cgroupfs
+```
+mount -t cgroupfs none /mnt
+```
+- Now we can pass control information through Cgroupfs. First, we write the cpu weight information of a certain process to the `cpu_shares` file in the `cpu` directory.
+```
+# In the initial state, the weight of each process is 1024 by default. The ratio of CPU occupancy rate between processes is equal to the ratio of CPU weight value. Therefore, if we want a process to have a higher CPU utilization rate, we will assign it a larger CPU weight value.
+echo process_pid + ' ' + weight_value > /mnt/cpu/cpu_shares
+# eg. echo '618 1024' > /mnt/cpu/cpu_shares
+```
+- 
