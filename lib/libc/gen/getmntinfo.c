@@ -60,10 +60,10 @@ getmntinfo(struct statvfs **mntbufp, int flags)
 	_DIAGASSERT(mntbufp != NULL);
 
 	if (mntsize <= 0 &&
-	    (mntsize = getvfsstat(NULL, (size_t)0, MNT_NOWAIT)) == -1)
+	    (mntsize = getvfsstat(NULL, (size_t)0, MNT_NOWAIT, 0)) == -1)
 		return (0);
 	if (bufsize > 0 &&
-	    (mntsize = getvfsstat(mntbuf, bufsize, flags)) == -1)
+	    (mntsize = getvfsstat(mntbuf, bufsize, flags, 0)) == -1)
 		return (0);
 	while (bufsize <= mntsize * sizeof(struct statvfs)) {
 		if (mntbuf)
@@ -71,7 +71,7 @@ getmntinfo(struct statvfs **mntbufp, int flags)
 		bufsize = (mntsize + 1) * sizeof(struct statvfs);
 		if ((mntbuf = malloc(bufsize)) == NULL)
 			return (0);
-		if ((mntsize = getvfsstat(mntbuf, bufsize, flags)) == -1)
+		if ((mntsize = getvfsstat(mntbuf, bufsize, flags, 0)) == -1)
 			return (0);
 	}
 	*mntbufp = mntbuf;

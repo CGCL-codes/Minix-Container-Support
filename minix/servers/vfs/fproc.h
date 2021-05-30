@@ -74,6 +74,8 @@ EXTERN struct fproc {
   message fp_msg;		/* pending or active message from process */
   message fp_pm_msg;		/* pending/active postponed PM request */
 
+  int mnt_num;
+
   char fp_name[PROC_NAME_LEN];	/* Last exec() */
 #if LOCK_DEBUG
   int fp_vp_rdlocks;		/* number of read-only locks on vnodes */

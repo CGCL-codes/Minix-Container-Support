@@ -92,11 +92,12 @@ static void clear_vmnt(struct vmnt *vmp)
 /*===========================================================================*
  *                             get_free_vmnt				     *
  *===========================================================================*/
-struct vmnt *get_free_vmnt(void)
+struct vmnt *get_free_vmnt(int *index)
 {
   struct vmnt *vmp;
 
-  for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; ++vmp) {
+  *index = 0;
+  for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; ++vmp, (*index)++) {
 	if (vmp->m_dev == NO_DEV) {
 		clear_vmnt(vmp);
 		return(vmp);

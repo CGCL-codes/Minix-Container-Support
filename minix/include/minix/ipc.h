@@ -69,9 +69,9 @@ typedef struct {
 _ASSERT_MSG_SIZE(mess_4);
 
 typedef struct {
-	int m7i1, m7i2, m7i3, m7i4, m7i5;
+	int m7i1, m7i2, m7i3, m7i4, m7i5, m7i6;
 	char *m7p1, *m7p2;
-	uint8_t padding[28];
+	uint8_t padding[24];
 } mess_7;
 _ASSERT_MSG_SIZE(mess_7);
 
@@ -695,8 +695,9 @@ typedef struct {
 	int32_t flags;
 	size_t len;
 	vir_bytes buf;		/* struct statvfs */
+	endpoint_t endpoint;
 
-	uint8_t padding[44];
+	uint8_t padding[40];
 } mess_lc_vfs_getvfsstat;
 _ASSERT_MSG_SIZE(mess_lc_vfs_getvfsstat);
 
@@ -758,8 +759,9 @@ typedef struct {
 	vir_bytes path;
 	vir_bytes type;
 	vir_bytes label;
+	endpoint_t mnt_ep;
 
-	uint8_t padding[20];
+	uint8_t padding[16];
 } mess_lc_vfs_mount;
 _ASSERT_MSG_SIZE(mess_lc_vfs_mount);
 
@@ -2434,9 +2436,9 @@ typedef struct {
 _ASSERT_MSG_SIZE(mess_lsys_cgp_sched_info);
 
 typedef struct {
-	uint32_t clone_flags;
-	uint32_t stack_addr;
-	uint32_t type;
+	int clone_flags;
+	int stack_addr;
+	int type;
 
 	uint8_t padding[44];
 } mess_lc_pm_clone;			/* Used in clone() */
@@ -2761,6 +2763,7 @@ typedef int _ASSERT_message[/* CONSTCOND */sizeof(message) == 64 ? 1 : -1];
 #define m7_i3  m_m7.m7i3
 #define m7_i4  m_m7.m7i4
 #define m7_i5  m_m7.m7i5
+#define m7_i6  m_m7.m7i6
 #define m7_p1  m_m7.m7p1
 #define m7_p2  m_m7.m7p2
 

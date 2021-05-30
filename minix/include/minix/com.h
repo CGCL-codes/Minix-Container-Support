@@ -578,6 +578,7 @@
 #  define VFS_PM_CPID		m7_i3	/* child pid */
 #  define VFS_PM_REUID		m7_i4	/* real and effective uid */
 #  define VFS_PM_REGID		m7_i5	/* real and effective gid */
+#  define VFS_PM_MNTNS      m7_i6   /* flags determine whether clone a new mnt ns for child process or not */
 
 /* Additional parameters for PM_DUMPCORE */
 #  define VFS_PM_TERM_SIG	m7_i2	/* process's termination signal */

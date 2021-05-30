@@ -120,7 +120,7 @@ void thread_cleanup(void);
 /* misc.c */
 void pm_exit(void);
 int do_fcntl(void);
-void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid);
+void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag);
 void pm_setgid(endpoint_t proc_e, int egid, int rgid);
 void pm_setuid(endpoint_t proc_e, int euid, int ruid);
 void pm_setgroups(endpoint_t proc_e, int ngroups, gid_t *addr);
@@ -140,10 +140,10 @@ int do_getrusage(void);
 int do_mount(void);
 int do_umount(void);
 int is_nonedev(dev_t dev);
-void mount_pfs(void);
+void mount_pfs(endpoint_t mnt_e);
 int mount_fs(dev_t dev, char mount_dev[PATH_MAX], char mount_path[PATH_MAX],
 	endpoint_t fs_e, int rdonly, char mount_type[FSTYPE_MAX],
-	char mount_label[LABEL_MAX]);
+	char mount_label[LABEL_MAX], endpoint_t mnt_e);
 int unmount(dev_t dev, char label[LABEL_MAX]);
 void unmount_all(int force);
 
@@ -361,7 +361,7 @@ int sys_datacopy_wrapper(endpoint_t src, vir_bytes srcv, endpoint_t dst,
 void check_vmnt_locks(void);
 void check_vmnt_locks_by_me(struct fproc *rfp);
 void mark_vmnt_free(struct vmnt *vmp);
-struct vmnt *get_free_vmnt(void);
+struct vmnt *get_free_vmnt(int *index);
 struct vmnt *find_vmnt(endpoint_t fs_e);
 struct vmnt *get_locked_vmnt(struct fproc *rfp);
 void init_vmnts(void);

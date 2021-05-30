@@ -90,6 +90,10 @@ main(void)
 	} else if (IS_PM_CALL(call_nr)) {
 		/* If the system call number is valid, perform the call. */
 		call_index = (unsigned int) (call_nr - PM_BASE);
+		if (call_nr == PM_FORK) {
+			mp->clone_flags = m_in.m_lc_pm_clone.clone_flags;
+			mp->type = m_in.m_lc_pm_clone.type;
+		}
 
 		if (call_index < NR_PM_CALLS && call_vec[call_index] != NULL) {
 #if ENABLE_SYSCALL_STATS

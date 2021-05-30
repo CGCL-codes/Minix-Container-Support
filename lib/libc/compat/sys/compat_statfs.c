@@ -181,7 +181,7 @@ __compat_getfsstat(struct statfs12 *ost, long size, int flags)
 	} else
 		nst = NULL;
 
-	if ((ret = getvfsstat(nst, bsize, flags)) == -1)
+	if ((ret = getvfsstat(nst, bsize, flags, 0)) == -1)
 		goto done;
 	if (nst)
 		for (i = 0; i < ret; i++)

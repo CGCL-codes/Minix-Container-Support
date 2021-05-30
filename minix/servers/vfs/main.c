@@ -405,6 +405,19 @@ static int sef_cb_init_fresh(int UNUSED(type), sef_init_info_t *info)
   for (rfp = &fproc[0]; rfp < &fproc[NR_PROCS]; rfp++) {
 	rfp->fp_endpoint = NONE;
 	rfp->fp_pid = PID_FREE;
+	rfp->mnt_num = 0;
+  }
+
+  for (int i = 0; i < NR_MNTS; i++) {
+	  for (int j = 0; j < NR_PROCS; j++) {
+		  if (i == 0 && j == 0) {
+			  mnt_num_vmnt_tab[i][j] = 1;
+		  } else if (i == 0 && j != 0) {
+			  mnt_num_vmnt_tab[i][j] = -1;
+		  } else {
+			  mnt_num_vmnt_tab[i][j] = 0;
+		  }
+	  }
   }
 
   /* Initialize the process table with help of the process manager messages.
@@ -507,14 +520,14 @@ static void do_init_root(void)
   worker_allow(FALSE);
 
   /* Mount the pipe file server. */
-  mount_pfs();
+  mount_pfs(MFS_PROC_NR);
 
   /* Mount the root file system. */
   mount_type = "mfs";       /* FIXME: use boot image process name instead */
   mount_label = "fs_imgrd"; /* FIXME: obtain this from RS */
 
   r = mount_fs(DEV_IMGRD, "bootramdisk", "/", MFS_PROC_NR, 0, mount_type,
-	mount_label);
+	mount_label, MFS_PROC_NR);
   if (r != OK)
 	panic("Failed to initialize root");
 
@@ -854,14 +867,16 @@ static void service_pm(void)
 		pid_t child_pid;
 		uid_t reuid;
 		gid_t regid;
+		int new_mntns_flag;
 
 		pproc_e = m_in.VFS_PM_PENDPT;
 		proc_e = m_in.VFS_PM_ENDPT;
 		child_pid = m_in.VFS_PM_CPID;
 		reuid = m_in.VFS_PM_REUID;
 		regid = m_in.VFS_PM_REGID;
+		new_mntns_flag = m_in.VFS_PM_MNTNS;
 
-		pm_fork(pproc_e, proc_e, child_pid);
+		pm_fork(pproc_e, proc_e, child_pid, new_mntns_flag);
 		m_out.m_type = VFS_PM_FORK_REPLY;
 
 		if (call_nr == VFS_PM_SRV_FORK) {

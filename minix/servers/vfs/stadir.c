@@ -352,13 +352,17 @@ int do_getvfsstat(void)
 {
 /* Perform the getvfsstat(buf, bufsize, flags) system call. */
   struct vmnt *vmp;
+  struct fproc *fpp;
   vir_bytes buf;
   size_t bufsize;
+  endpoint_t endpoint;
   int r, flags, count, do_lock;
 
   buf = job_m_in.m_lc_vfs_getvfsstat.buf;
   bufsize = job_m_in.m_lc_vfs_getvfsstat.len;
   flags = job_m_in.m_lc_vfs_getvfsstat.flags;
+  endpoint = job_m_in.m_lc_vfs_getvfsstat.endpoint;
+  fpp = fproc_addr(endpoint);
 
   count = 0;
 
@@ -371,10 +375,17 @@ int do_getvfsstat(void)
 	 */
 	do_lock = !(flags & ST_NOWAIT);
 
-	for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; vmp++) {
+  int mnt_num_tmp = fpp->mnt_num;
+
+  int i = 1;
+	for (vmp = &vmnt[0]; vmp < &vmnt[NR_MNTS]; vmp++, i++) {
 		/* If there is no more space, return the count so far. */
 		if (bufsize < sizeof(struct statvfs))
 			break;
+    
+    if (mnt_num_vmnt_tab[i][mnt_num_tmp] != 1) {
+      continue;
+    }
 
 		/* Lock the file system before checking any fields. */
 		if (do_lock && (r = lock_vmnt(vmp, VMNT_READ)) != OK)

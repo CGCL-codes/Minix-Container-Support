@@ -574,7 +574,7 @@ pm_reboot(void)
 /*===========================================================================*
  *				pm_fork					     *
  *===========================================================================*/
-void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid)
+void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid, int new_mntns_flag)
 {
 /* Perform those aspects of the fork() system call that relate to files.
  * In particular, let the child inherit its parent's file descriptors.
@@ -587,6 +587,10 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid)
 #endif /* !defined(NDEBUG) */
   int i, parentno, childno;
   mutex_t c_fp_lock;
+
+  if (new_mntns_flag == 1) {
+	  printf("new_mntns_flag: %d\n", new_mntns_flag);
+  }
 
   /* Check up-to-dateness of fproc. */
   okendpt(pproc, &parentno);
@@ -606,6 +610,19 @@ void pm_fork(endpoint_t pproc, endpoint_t cproc, pid_t cpid)
   c_fp_lock = fproc[childno].fp_lock;
   fproc[childno] = fproc[parentno];
   fproc[childno].fp_lock = c_fp_lock;
+
+  if (new_mntns_flag == 1) {
+	  int mnt_num_of_child = 0;
+	  for (; mnt_num_vmnt_tab[0][mnt_num_of_child] == 1; mnt_num_of_child++);
+	  mnt_num_vmnt_tab[0][mnt_num_of_child] = 1;
+	  fproc[childno].mnt_num = mnt_num_of_child;
+
+	  for (int i = 0; i < NR_MNTS; i++) {
+		  mnt_num_vmnt_tab[i][fproc[childno].mnt_num] = mnt_num_vmnt_tab[i][fproc[parentno].mnt_num];
+	  }
+  } else {
+	  fproc[childno].mnt_num = fproc[parentno].mnt_num;
+  }
 
   /* Increase the counters in the 'filp' table. */
   cp = &fproc[childno];
