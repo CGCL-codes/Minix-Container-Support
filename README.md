@@ -45,3 +45,89 @@ echo process_pid + ' ' + vm_limit_in_bytes > /mnt/memory/vm_limit_in_bytes
 echo process_pid + ' ' + process_state > /mnt/freezer/freezer_state
 eg. echo '618 FROZEN' > /mnt/freezer/freezer_state     echo '618 THAWED' > /mnt/freezer/freezer_state
 ```
+## Microkernel-Based Container View Isolation Mechanism (MCVIM)
+MCVIM gives processes in a container an independent resource view which would not be seen or changed by other processes. 
+The minix user space has been divided into multiple namespaces for isolated resources, each contains a view of the corresponding resource.
+Each user process belongs to one space of each resource and can only read and write the resource view in its space. 
+
+### Description
+Currently, MCVIM has realized isolation mechanisms for two resources in the user space of Minix: 
+- **Hostname View Isolation Mechanism** provides user processes in each hostname namespace an independent hostname to read and write.
+- **File Mount View Isolation Mechanism** provides user processes in each file mount view namespace an independent file mount view to mount, umount a filesystem or display the mount list. 
+
+### Usage
+- Go to the main directory of source code and switch to `feature-namespace1.0` branch. Compile the whole system and reboot.
+```
+git checkout feature-namespace1.0
+build world
+reboot
+```
+- In the initial state, all user processes are in the default hostname and file mount view space, share the same hostname and mount view.
+```
+# We can read the hostname by typing command `hostname`.
+hostname
+
+# To change the current hostname, type command `hostname` followed by a new name.
+hostname newname
+
+# We can mount or umount a filesystem.
+mount -t cgroupfs none /mnt
+umount /mnt
+
+```
+- Now we can write a C program to call function `clone` to create a new process.
+```			
+clang Clone.c -o clone
+./clone
+```
+- eg. Clone.c
+```
+#include <sys/wait.h>	// waitpid
+#include <sched.h>	// clone
+#include <sys/sched.h>	// CLONE_NEWUTS
+#include <signal.h>	// SIGCHLD
+#include <unistd.h>	// sleep, getpid
+#include <stdio.h>	// printf
+
+#define STACK_SIZE (1024*1024)
+
+static char child_stack[STACK_SIZE];
+char* const child_args[] = {
+	"/bin/sh",
+	NULL
+};
+
+int child_main(void* args) {
+	
+  printf("child: current process ID:%d\n", getpid());
+	execv(child_args[0], child_args);
+	
+	return 1;
+}
+
+int main(){
+
+	int child_pid = clone(child_main, child_stack + STACK_SIZE, SIGCHLD, NULL); 
+	if (child_pid == -1)
+       return 0;
+	
+	waitpid(child_pid, NULL, 0);
+	
+	printf("quit\n");
+}
+
+```
+- The above process is in the same space with it creator. To create a process in a different hostname space, we should use param `CLONE_NEWUTS`.
+```
+int child_pid = clone(child_main, child_stack + STACK_SIZE, CLONE_NEWUTS | SIGCHLD, NULL); 
+```
+- We can also create a process in a different file mount space from its creator with param `CLONE_NEWNS`. Then we mount or umount file systems in a view different from that in the default space.
+```
+int child_pid = clone(child_main, child_stack + STACK_SIZE, CLONE_NEWNS | SIGCHLD, NULL); 
+```
+- To display a file mount view of a process, we should first get its pid , and then read its mount list.
+```
+# For example,  We use command `ps` to get the pid of current sh is 666, and the creator is 665. We display their views respectively.
+cat /proc/665/mounts
+cat /proc/666/mounts
+```
