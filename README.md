@@ -51,7 +51,7 @@ The minix user space has been divided into multiple namespaces for isolated reso
 Each user process belongs to one space of each resource and can only read and write the resource view in its space. 
 
 ### Description
-Currently, MCVIM has realized isolation mechanisms for two resources in the user space of Minix: 
+Currently, MCVIM has realized isolation mechanisms for two types of resources in the user space of Minix: 
 - **Hostname View Isolation Mechanism** provides user processes in each hostname namespace an independent hostname to read and write.
 - **File Mount View Isolation Mechanism** provides user processes in each file mount view namespace an independent file mount view to mount, umount a filesystem or display the mount list. 
 
@@ -59,7 +59,7 @@ Currently, MCVIM has realized isolation mechanisms for two resources in the user
 - Go to the main directory of source code and switch to `feature-namespace1.0` branch. Compile the whole system and reboot.
 ```
 git checkout feature-namespace1.0
-build world
+make world
 reboot
 ```
 - In the initial state, all user processes are in the default hostname and file mount view space, share the same hostname and mount view.
@@ -117,7 +117,7 @@ int main(){
 }
 
 ```
-- The above process is in the same space with it creator. To create a process in a different hostname space, we should use param `CLONE_NEWUTS`.
+- The above process is in the same space with its creator. To create a process in a different hostname space, we should use param `CLONE_NEWUTS`.
 ```
 int child_pid = clone(child_main, child_stack + STACK_SIZE, CLONE_NEWUTS | SIGCHLD, NULL); 
 ```
